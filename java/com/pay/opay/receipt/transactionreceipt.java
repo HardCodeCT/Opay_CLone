@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.pay.opay.AccountInfo;
 import com.pay.opay.date.DateTimeHolder;
-import com.pay.opay.LoaderRotator;
+import com.pay.opay.rotator.LoaderRotator;
 import com.pay.opay.R;
 
 public class transactionreceipt extends AppCompatActivity {
