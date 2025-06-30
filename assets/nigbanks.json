@@ -1,0 +1,391 @@
+[
+  {
+    "name": "ASO Savings & Loans",
+    "code": "90001",
+    "image" : "bank_access_bank_round"
+  },
+  {
+    "name": "Access Bank Plc",
+    "code": "044",
+    "image" : "bank_aso_round"
+  },
+  {
+    "name": "ALAT by WEMA",
+    "code": "035a",
+    "image" : "house"
+  },
+  {
+    "name": "9mobile 9Payment Service Bank",
+    "code" : "120001",
+    "image" : "house"
+  },
+  {
+    "name": "Assetmatrix MFB",
+    "code": "90287",
+    "image" : "bank_assetmatrix_round"
+  },
+  {
+    "name" :"Bainescredit MFB",
+    "code" : "51229",
+    "image" : "house"
+  },
+  {
+    "name" : "Bowen Microfinance Bank",
+    "code" : "50931",
+    "image" : "house"
+  },
+  {
+    "name": "Cellulant",
+    "code": "100005",
+     "image" : "bank_cellulant_round"
+  },
+  {
+    "name" : "CEMCS Microfinance Bank",
+    "code" : "50823",
+    "image" : "house"
+  },
+  {
+    "name": "Citibank Nigeria Ltd",
+    "code": "023",
+      "image" : "bank_citi_round"
+  },
+  {
+    "name": "Contec Global",
+    "code": "100032",
+     "image" : "bank_contec_global_round"
+  },
+  {
+    "name" : "Corestep MFB",
+    "code" : "50204",
+    "image" : "house"
+  },
+  {
+    "name":"Coronation Merchant Bank",
+    "code" : "559",
+    "image":"house"
+  },
+  {
+    "name": "Ecobank Nigeria Plc",
+    "code": "050",
+     "image" : "bank_ecobank_round"
+  },
+  {
+    "name": "Ekimogun MFB",
+    "code" : "50263",
+    "image" :"house"
+  },
+  {
+    "name" : " Ekondo Microfinance Bank",
+    "code" : "562",
+    "image" : "house"
+
+  },
+  {
+    "name": "Enterprise Bank",
+    "code": "085",
+     "image" : "bank_enterprise_round"
+  },
+  {
+    "name" : "Eyowo",
+    "code" : "50126",
+    "image" : "house"
+  },
+  {
+    "name": "Fidelity Bank Plc",
+    "code": "070",
+     "image" : "bank_fidelity_round"
+  },
+  {
+    "name" : "Firmus MFB",
+    "code" : "51314",
+    "image" : "house"
+  },
+  {
+    "name": "First Bank of Nigeria Ltd",
+    "code": "011",
+     "image" : "bank_first_round"
+  },
+  {
+    "name": "First City Monument Bank Plc (FCMB)",
+    "code": "214",
+     "image" : "bank_fcmb_round"
+  },
+  {
+    "name": "FSDH Merchant Bank Limited",
+    "code" : "501",
+    "image" : "house"
+  },
+  {
+    "name":"Gateway Mortgage Bank LTD",
+    "code":"812",
+    "image":"house"
+  },
+  {
+    "name": "Globus Bank Ltd",
+    "code": "027",
+     "image" : "bank_globus_round"
+  },
+  {
+    "name" : "GoMoney",
+    "code" : "100022",
+    "image" : "bank_go_money_round"
+  },
+  {
+    "name": "Guaranty Trust Bank Plc (GTBank)",
+    "code": "058",
+     "image" : "bank_gtbank_round"
+  },
+  {
+    "name": "Heritage Bank Plc",
+    "code": "030",
+     "image" : "bank_heritage_round"
+  },
+  {
+    "name":"Hackman Microfinance Bank",
+    "code" : "51251",
+    "image" : "house"
+  },
+  {
+    "name" : "Hasal Microfinance Bank",
+    "code" : "50383",
+    "image" : "house"
+  },
+  {
+    "name":"HopePSB",
+    "code" :"120002",
+    "image" : "bank_hope_psb_round"
+  },
+  {
+    "name" : "Ibile Microfinance Bank",
+    "code" : "51244",
+    "image" : "house"
+  },
+  {
+    "name" : "Ikoyi Osun MFB",
+    "code" : "50439",
+    "image" :"house"
+  },
+  {
+    "name":"Infinity MFB",
+    "code" : "50457",
+    "image" : "house"
+  },
+  {
+    "name": "Jaiz Bank Plc",
+    "code": "301",
+     "image" : "bank_jaiz_round"
+  },
+  {
+    "name": "Kadpoly MFB",
+    "code" : "50502",
+    "image" :"house"
+  },
+  {
+    "name": "Keystone Bank Ltd",
+    "code": "082",
+     "image" : "bank_keystone_round"
+  },
+  {
+    "name":"Kredi Money MFB LTD",
+    "code":"50200",
+    "image":"bank_kredi_money_round"
+  },
+   {
+    "name": "Kuda Microfinance Bank",
+    "code": "90267",
+     "image" : "bank_kuda_mfa_round"
+  },
+  {
+    "name":"Lagos Building Investment Company Plc.",
+    "code" : "90052",
+    "image" : "house"
+  },
+  {
+    "name":"Links MFB",
+    "code" : "50549",
+    "image" : "house"
+  },
+  {
+   "name" : "Living Trust Mortgage Bank",
+   "code":"031",
+   "image" : "house" 
+  },
+  {
+    "name":"Lotus Bank",
+    "code" : "303",
+    "image" : "bank_lotus_round"
+  },
+  {
+    "name" : "Mayfair MFB",
+    "code" : "50563",
+    "image" : "house"
+  },
+  {
+    "name" :"Mint MFB",
+    "code" : "50304",
+    "image" : "bank_mint_finex_mfb_round"
+  },
+  {
+    "name": "Moniepoint bank",
+    "code":"50515",
+    "image":"bank_monie_point_round"
+
+  },
+  {
+    "name": "MTN MOMO PSB",
+    "code" :"120003",
+    "image": "house"
+  },
+  {
+    "name": "OPay Digital Services Limited",
+    "code": "999992",
+     "image" : "bank_opay"
+  },
+  {
+    "name": "Paga",
+    "code": "100002",
+     "image" : "bank_paga_round"
+  },
+  {
+    "name": "PalmPay",
+    "code": "999991",
+     "image" : "bank_palmpay_round"
+  },
+  {
+    "name":"Parallex Bank",
+    "code" :"104",
+    "image" : "bank_parallex_round"
+  },
+  {
+    "name" : "Parkway - ReadyCash",
+    "code" : "311",
+    "image":"bank_parkway_round"
+  },
+  {
+    "name": "Polaris Bank Ltd",
+    "code": "076",
+     "image" : "bank_polaris_round"
+  },
+  {
+    "name":"Polyunwana MFB",
+    "code" : "50864",
+    "image":"house"
+  },
+  {
+  "name":"PremiumTrust Bank",
+  "code":"105",
+  "image":"house"
+    }
+,
+  {
+    "name": "Providus Bank Ltd",
+    "code": "101",
+     "image" : "bank_providus_round"
+  },
+  {
+    "name":"QuickFund MFB",
+    "code":"51293",
+    "image":"house"
+  },
+  {
+    "name":"Rand Merchant Bank",
+    "code":"502",
+    "image":"house"
+  },
+  {
+    "name":"Refuge Mortgage Bank",
+    "code": "90067",
+    "image":"house"
+  },
+  {
+    "name":"Rubies MFB",
+    "code":"125",
+    "image":"bank_rubies_mfb_round"
+  },
+  {
+    "name": "Safe Haven MFB",
+    "code":"51113",
+    "image":"house"
+  },
+  {
+    "name":"Solid Rock MFB",
+    "code":"51310",
+    "image":"house"
+  },
+  {
+    "name":"Sparkle Microfinance Bank",
+    "code": "51310",
+    "image":"house"
+  }
+  ,
+  {
+    "name": "Stanbic IBTC Bank Plc",
+    "code": "039",
+     "image" : "bank_stanbic_ibic_round"
+  },
+  {
+    "name": "Standard Chartered Bank Nigeria Ltd",
+    "code": "068",
+     "image" : "bank_standard_chartered_round"
+  },
+  {
+    "name": "Sterling Bank Plc",
+    "code": "232",
+     "image" : "bank_sterling_round"
+  },
+  {
+    "name": "SunTrust Bank Nigeria Ltd",
+    "code": "100",
+     "image" : "bank_suntrust_round"
+  },
+  {
+    "name": "TAJ Bank Ltd",
+    "code": "026",
+     "image" : "bank_taj_round"
+  },
+  {
+    "name":"Tangerine Money",
+    "code":"51269",
+    "image":"house"
+  },
+  {
+    "name":"TCF MFB",
+    "code":"51211",
+    "image":"house"
+  },
+  {
+    "name": "Titan Trust Bank Ltd",
+    "code": "025",
+     "image" : "bank_titan_trust_round"
+  },
+  {
+    "name": "Union Bank of Nigeria Plc",
+    "code": "032",
+     "image" : "bank_union_round"
+  },
+  {
+    "name": "United Bank for Africa Plc (UBA)",
+    "code": "033",
+     "image" : "bank_uba_round"
+  },
+  {
+    "name": "Unity Bank Plc",
+    "code": "215",
+     "image" : "bank_unity_round"
+  },
+  {
+    "name":"VFD Microfinance Bank Limited",
+    "code":"566",
+    "image": "house"
+  },
+  {
+    "name": "Wema Bank Plc",
+    "code": "035",
+     "image" : "bank_wema_round"
+  },
+  {
+    "name": "Zenith Bank Plc",
+    "code": "057",
+     "image" : "bank_zenith_round"
+  }
+]
