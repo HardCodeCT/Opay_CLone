@@ -1,47 +1,80 @@
 package com.pay.opay.viewmodel;
 
 import android.app.Application;
+import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.pay.opay.AmountRepository;
 import com.pay.opay.database.Amount;
 
-import java.util.List;
-
 public class AmountViewModel extends AndroidViewModel {
     private final AmountRepository repository;
-    private final LiveData<List<Amount>> allAmounts;
-    private final LiveData<Integer> totalAmount;
+    private final MutableLiveData<Boolean> shouldTriggerAction = new MutableLiveData<>();
 
-    public AmountViewModel(Application application) {
+    public AmountViewModel(@NonNull Application application) {
         super(application);
         repository = new AmountRepository(application);
-        allAmounts = repository.getAllAmounts();
-        totalAmount = repository.getTotalAmount();
+
+        // Initialize with default amount if needed
+        repository.checkStateAndPerform(() -> {
+            shouldTriggerAction.postValue(true);
+        });
     }
 
-    public LiveData<List<Amount>> getAllAmounts() {
-        return allAmounts;
+    // Get the current amount LiveData
+    public LiveData<Amount> getCurrentAmount() {
+        return repository.getCurrentAmount();
     }
 
-    public LiveData<Integer> getTotalAmount() {
-        return totalAmount;
+    // Get the current state LiveData
+    public LiveData<Boolean> getCurrentState() {
+        return repository.getCurrentState();
     }
 
-    public void insert(Amount amount) {
-        repository.insert(amount);
+    // Observe when action should be triggered (state is false)
+    public LiveData<Boolean> shouldTriggerAction() {
+        return shouldTriggerAction;
     }
 
-    public void update(Amount amount) {
-        repository.update(amount);
+    // Update the amount value
+    public void updateAmount(int newAmount) {
+        repository.updateAmountValue(newAmount);
     }
 
-    public void delete(Amount amount) {
-        repository.delete(amount);
+    // Update the state value
+    public void setState(boolean newState) {
+        repository.updateState(newState);
+        if (newState) {
+            shouldTriggerAction.postValue(false);
+        }
     }
 
-    public void deleteAll() {
-        repository.deleteAll();
+    // Check state and perform action if false
+    public void checkStateAndPerform(Runnable action) {
+        repository.checkStateAndPerform(action);
+    }
+
+    // Reset both amount and state
+    public void resetAmount() {
+        repository.resetAmount();
+        shouldTriggerAction.postValue(true);
+    }
+
+    // Get the current amount value (blocking call - use carefully)
+    public int getCurrentAmountValue() {
+        Amount amount = repository.getCurrentAmount().getValue();
+        return amount != null ? amount.getAmountValue() : 0;
+    }
+
+    // Get the current state value (blocking call - use carefully)
+    public boolean getCurrentStateValue() {
+        Boolean state = repository.getCurrentState().getValue();
+        return state != null ? state : false;
+    }
+
+    public LiveData<Integer> getAmountValue() {
+        return repository.getAmountValue();
     }
 }

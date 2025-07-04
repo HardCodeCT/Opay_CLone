@@ -109,7 +109,7 @@ public class transfertobank extends AppCompatActivity {
                     filled++;
                     accountinput.setEnabled(false);
                     patch.setVisibility(View.VISIBLE);
-                    searching.setVisibility(View.VISIBLE);
+                    /*searching.setVisibility(View.VISIBLE);*/
                     accountnumber = accountinput.getText().toString();
                     startRotating();
                     checkBankUpdate();
@@ -150,18 +150,19 @@ public class transfertobank extends AppCompatActivity {
                     stopRotating();
                     centerIcon.setVisibility(View.GONE);
                     centerText.setText(accountInfo.getUserAccount());
+                    accountInfo.setUserNumber(accountnumber);
 
-                    new Thread(() -> {
-                        BankName bankName = new BankName();
-                        bankName.accountName = accountInfo.getUserAccount();
-                        bankName.bankName = bankData.getBankName();
-                        bankName.bankNumber = accountnumber;
-                        bankName.imageName = bankData.getBankImage();
-
-                        BankNameDatabase.getInstance(getApplicationContext())
-                                .bankNameDao()
-                                .insertIfNotExists(bankName);
-                    }).start();
+//                    new Thread(() -> {
+//                        BankName bankName = new BankName();
+//                        bankName.accountName = accountInfo.getUserAccount();
+//                        bankName.bankName = bankData.getBankName();
+//                        bankName.bankNumber = accountnumber;
+//                        bankName.imageName = bankData.getBankImage();
+//
+//                        BankNameDatabase.getInstance(getApplicationContext())
+//                                .bankNameDao()
+//                                .insertIfNotExists(bankName);
+//                    }).start();
                 }
             }
             // No else, no reposting

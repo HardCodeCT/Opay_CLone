@@ -17,6 +17,7 @@ import com.pay.opay.adapter.BankContactAdapter;
 import com.pay.opay.viewmodel.BankContactViewModel;
 import com.pay.opay.R;
 import com.pay.opay.database.BankName;
+import com.pay.opay.viewmodel.ContactViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +36,7 @@ public class BankRecentFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        bankContactViewModel = new ViewModelProvider(this).get(BankContactViewModel.class);
+        bankContactViewModel =  new ViewModelProvider(requireActivity()).get(BankContactViewModel.class);
 
         RecyclerView recyclerView = view.findViewById(R.id.recyclerViewRecents);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));

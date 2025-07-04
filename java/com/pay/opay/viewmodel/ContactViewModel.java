@@ -48,4 +48,13 @@ public class ContactViewModel extends AndroidViewModel {
             }
         }).start();
     }
+
+    public LiveData<List<Contact>> getContactsMatching(String query) {
+        return contactDao.findMatchingContacts("%" + query + "%");
+    }
+
+    public LiveData<List<Contact>> getContactByPhone(String phone) {
+        return contactDao.findExactContactByPhone(phone);
+    }
+
 }

@@ -1,5 +1,5 @@
-// File: Contact.java
-package com.pay.opay.database; // Or use your actual package
+package com.pay.opay.database;
+
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -18,5 +18,17 @@ public class Contact {
         this.name = name;
         this.phone = phone;
         this.imageResId = imageResId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public int getImageId() {
+        return imageResId;
     }
 }

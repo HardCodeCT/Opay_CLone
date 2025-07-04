@@ -5,37 +5,58 @@ import androidx.room.PrimaryKey;
 
 @Entity(tableName = "amount_table")
 public class Amount {
-    @PrimaryKey(autoGenerate = true)
-    private int id;
+    @PrimaryKey
+    private int id = 1; // Fixed ID to ensure only one row
 
     private int amountValue;
-    private String description;
-    private long timestamp;
+    private boolean stateValue = false; // Default to false
+    private long timestamp = System.currentTimeMillis();
 
-    public Amount(int amountValue, String description) {
+    // Empty constructor for Room
+    public Amount() {}
+
+    public Amount(int amountValue) {
         this.amountValue = amountValue;
-        this.description = description;
-        this.timestamp = System.currentTimeMillis();
     }
 
-    // Getters and Setters
+    // Getters
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public int getAmountValue() {
         return amountValue;
     }
 
-    public String getDescription() {
-        return description;
+    public boolean getStateValue() {
+        return stateValue;
     }
 
     public long getTimestamp() {
         return timestamp;
+    }
+
+    // Setters
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setAmountValue(int amountValue) {
+        this.amountValue = amountValue;
+    }
+
+    public void setStateValue(boolean stateValue) {
+        this.stateValue = stateValue;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    // Helper method to check state and perform action
+    public void checkStateAndPerform(Runnable actionIfFalse) {
+        if (!stateValue) {
+            actionIfFalse.run();
+        }
     }
 }

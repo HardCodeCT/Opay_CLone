@@ -14,11 +14,22 @@ public class AccountInfo {
     private int bankUpdate;
 
     // Private constructor to prevent others from creating new instances
-    private AccountInfo() {
-    }
+    private AccountInfo() {}
 
     public static AccountInfo getInstance() {
         return instance;
+    }
+
+    public void reset() {
+        amount = null;
+        userAccount = null;
+        userNumber = null;
+        rootAccount = null;
+        rootNumber = null;
+        userBank = null;
+        rootBank = null;
+        Response = 0;
+        bankUpdate = 0;
     }
 
     public String getAmount() {
@@ -48,7 +59,6 @@ public class AccountInfo {
     public String getRootNumber() {
         return rootNumber;
     }
-
     public void setRootNumber(String rootNumber) {
         this.rootNumber = rootNumber;
     }
@@ -76,5 +86,4 @@ public class AccountInfo {
     public void setBankUpdate(int bankUpdate) {
         this.bankUpdate = bankUpdate;
     }
-
 }

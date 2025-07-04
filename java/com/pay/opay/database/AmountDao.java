@@ -2,33 +2,31 @@ package com.pay.opay.database;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
-import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import java.util.List;
-
 @Dao
 public interface AmountDao {
-    @Insert
-    void insert(Amount amount);
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertOrUpdate(Amount amount);
 
     @Update
     void update(Amount amount);
 
-    @Delete
-    void delete(Amount amount);
+    @Query("SELECT * FROM amount_table WHERE id = 1 LIMIT 1")
+    LiveData<Amount> getAmount();
 
-    @Query("DELETE FROM amount_table")
-    void deleteAllAmounts();
+    @Query("SELECT stateValue FROM amount_table WHERE id = 1 LIMIT 1")
+    LiveData<Boolean> getStateValue();
 
-    @Query("SELECT * FROM amount_table ORDER BY timestamp DESC")
-    LiveData<List<Amount>> getAllAmounts();
+    @Query("UPDATE amount_table SET stateValue = :newState WHERE id = 1")
+    void updateState(boolean newState);
 
-    @Query("SELECT SUM(amountValue) FROM amount_table")
-    LiveData<Integer> getTotalAmount();
+    @Query("SELECT COUNT(*) FROM amount_table")
+    int count();
 
-    @Query("SELECT * FROM amount_table WHERE amountValue > :minValue")
-    LiveData<List<Amount>> getAmountsAbove(int minValue);
+    @Query("SELECT amountValue FROM amount_table WHERE id = 1")
+    LiveData<Integer> getAmountValue();
 }
