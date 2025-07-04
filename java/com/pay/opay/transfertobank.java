@@ -22,8 +22,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.pay.opay.adapter.BankTabAdapter;
-import com.pay.opay.database.BankName;
-import com.pay.opay.database.BankNameDatabase;
+import com.pay.opay.resolver.BankResolver;
 
 public class transfertobank extends AppCompatActivity {
     private TabLayout tabLayout;

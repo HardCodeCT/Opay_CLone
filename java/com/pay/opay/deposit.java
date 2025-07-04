@@ -22,6 +22,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 import com.pay.opay.adapter.AccountAdapter;
 import com.pay.opay.adapter.TabAdapter;
 import com.pay.opay.database.Contact;
+import com.pay.opay.resolver.BankResolver;
 import com.pay.opay.viewmodel.ContactViewModel;
 
 import java.util.ArrayList;
