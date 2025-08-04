@@ -5,30 +5,48 @@ import android.os.Bundle;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.pay.opay.AccountInfo;
+import com.pay.opay.MainActivity;
 import com.pay.opay.R;
 
 public class transfersuccessful extends AppCompatActivity {
 
-    AccountInfo accountInfo = AccountInfo.getInstance();
-    ViewGroup viewdeet, addfav, viewdet;
-    String Amount;
-    TextView amounttext;
+    private AccountInfo accountInfo = AccountInfo.getInstance();
+    private ViewGroup viewdeet, addfav, viewdet;
+    private TextView amounttext;
+    private String Amount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.transfer_successful);
 
-        Amount = "₦" + accountInfo.getAmount() +".00";
+        setupUI();
+        setupListeners();
+        populateAmount();
+        setupBackPressHandler();
+    }
 
+    private void setupBackPressHandler() {
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                handleBackPressed();
+            }
+        };
+        getOnBackPressedDispatcher().addCallback(this, callback);
+    }
+
+    private void setupUI() {
         amounttext = findViewById(R.id.amountText);
         viewdeet = findViewById(R.id.viewdeet);
         viewdet = findViewById(R.id.viewdet);
         addfav = findViewById(R.id.addfav);
+    }
 
+    private void setupListeners() {
         viewdeet.setOnClickListener(v -> {
             Intent intent = new Intent(transfersuccessful.this, transactionreceipt.class);
             startActivity(intent);
@@ -39,9 +57,20 @@ public class transfersuccessful extends AppCompatActivity {
             startActivity(intent);
         });
 
-        addfav.setOnClickListener(v -> Toast.makeText(getApplicationContext(), "Added to favourites", Toast.LENGTH_SHORT).show());
+        addfav.setOnClickListener(v ->
+                Toast.makeText(getApplicationContext(), "Added to favourites", Toast.LENGTH_SHORT).show()
+        );
+    }
 
+    private void populateAmount() {
+        Amount = "₦" + accountInfo.getAmount() + ".00";
         amounttext.setText(Amount);
     }
 
+    private void handleBackPressed() {
+        accountInfo.reset();
+        Intent intent = new Intent(transfersuccessful.this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
 }

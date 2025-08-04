@@ -2,6 +2,7 @@ package com.pay.opay.receipt;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -17,11 +18,9 @@ public class transactionreceipt extends AppCompatActivity {
     AccountInfo accountInfo = AccountInfo.getInstance();
     private View rotatingFrame;
     private ViewGroup rootLayout, loader;
-    Handler handller;
+    Handler handller = new Handler(Looper.getMainLooper());;
     DateTimeHolder dateTimeHolder = DateTimeHolder.getInstance();
-
     String Amount, Username, Useraccount, Rootaccount, Rootnumber, Datetime, Userbank, Rootbank;
-
     TextView amountid, username, useraccount, rootaccount, rootnumber, datetime, userbank, rootbank;
 
     @Override
@@ -50,7 +49,6 @@ public class transactionreceipt extends AppCompatActivity {
         rootLayout = findViewById(R.id.rootlayout);
         loader = findViewById(R.id.loader);
         rotatingFrame = findViewById(R.id.rotatingBackground);
-
 
 
         LoaderRotator rotator = new LoaderRotator(rotatingFrame, loader, rootLayout);

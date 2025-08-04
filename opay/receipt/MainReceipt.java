@@ -72,6 +72,8 @@ public class MainReceipt extends AppCompatActivity {
         String fullDate = accountInfo.getLongDateTime();
         String shortDate = accountInfo.getShortDateTime();
 
+        bankImage.setImageResource(accountInfo.getActivebank());
+
         accountName.setText("Transfer to " + userAccountStr);
         mainAmount.setText(amount);
         fullAmount.setText(amount);
