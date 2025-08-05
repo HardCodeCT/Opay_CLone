@@ -7,9 +7,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.pay.opay.AccountInfo;
 import com.pay.opay.MainActivity;
 import com.pay.opay.R;
+import com.pay.opay.TransferManager.TransferManager;
+import com.pay.opay.viewmodel.BankTransferViewModel;
 
 public class transfersuccessful extends AppCompatActivity {
 
@@ -27,6 +31,7 @@ public class transfersuccessful extends AppCompatActivity {
         setupListeners();
         populateAmount();
         setupBackPressHandler();
+        setupTransfer();
     }
 
     private void setupBackPressHandler() {
@@ -72,5 +77,11 @@ public class transfersuccessful extends AppCompatActivity {
         Intent intent = new Intent(transfersuccessful.this, MainActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    private void setupTransfer() {
+        BankTransferViewModel bankTransferViewModel = new ViewModelProvider(this).get(BankTransferViewModel.class);
+        TransferManager transferManager = new TransferManager(bankTransferViewModel, accountInfo);
+        transferManager.insertTransfer();
     }
 }

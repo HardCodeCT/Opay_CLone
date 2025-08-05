@@ -50,7 +50,6 @@ import java.util.Objects;
         private EditText[] pins;
         private TextView username, useraccount;
         private ImageView setbank;
-        // Data
         private String Amount;
         private final ArrayList<String> list = new ArrayList<>(4);
         private AccountInfo accountInfo = AccountInfo.getInstance();
@@ -139,6 +138,7 @@ import java.util.Objects;
         }
 
         private void displayUserInfo() {
+            bankingImage.setImageResource(accountInfo.getActivebank());
             username.setText(accountInfo.getUserAccount());
             useraccount.setText(accountInfo.getUserNumber());
         }
@@ -355,25 +355,11 @@ import java.util.Objects;
             dimOverlay.setVisibility(View.GONE);
         }
 
-        public void insertTransfer(){
-            accountInfo.setLongDateTime(dateTimeHolder.getFormattedDateTime());
-            accountInfo.setShortDateTime(dateTimeHolder.getShortFormattedDateTime());
-            bankTransferViewModel = new ViewModelProvider(this).get(BankTransferViewModel.class);
-            BankTransfer bankTransfer = new BankTransfer();
-            bankTransfer.senderName = accountInfo.getUserAccount();
-            bankTransfer.accountNumber = accountInfo.getUserNumber();
-            bankTransfer.bankName = accountInfo.getUserBank();
-            bankTransfer.amount = accountInfo.getAmount();
-            bankTransfer.longdatetime = accountInfo.getLongDateTime();
-            bankTransfer.shortdatetime =accountInfo.getShortDateTime();
-        }
-
     public void insertintodb() {
         if (Objects.equals(accountInfo.getUserBank(), "Opay")) {
             contactViewModel.insertIfNotExists(
                     new Contact(accountInfo.getUserAccount(), accountInfo.getUserNumber(), R.mipmap.profile_image)
             );
-            insertTransfer();
         } else if (Objects.equals(accountInfo.getUserBank(), "Bank")) {
             BankName bankName = new BankName();
             bankName.setAccountName(accountInfo.getUserAccount());
@@ -382,7 +368,6 @@ import java.util.Objects;
             bankName.setImageName(bankData.getBankImage());
             // Use the ViewModel's method
             bankContactViewModel.insertIfNotExists(bankName);
-            insertTransfer();
         }
     }
 

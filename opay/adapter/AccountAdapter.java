@@ -10,9 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.pay.opay.AccountInfo;
 import com.pay.opay.R;
 import com.pay.opay.database.Contact;
@@ -25,11 +23,9 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.ViewHold
     private OnDataChangedListener dataChangedListener;
     private OnItemClickListener itemClickListener;
     private String query = "";
-
     public AccountAdapter(List<Contact> contactList) {
         this.contactList = contactList;
     }
-
     public interface OnDataChangedListener {
         void onChanged();
     }
@@ -113,6 +109,7 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.ViewHold
         holder.image.setImageResource(contact.getImageId());
 
         holder.itemView.setOnClickListener(v -> {
+            AccountInfo.getInstance().setActivebank(R.mipmap.bank_opay);
             AccountInfo.getInstance().setUserAccount(name);
             AccountInfo.getInstance().setUserNumber(phone);
             AccountInfo.getInstance().setUserBank("Opay");

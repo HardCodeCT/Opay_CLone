@@ -1,5 +1,6 @@
 package com.pay.opay.receipt;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -7,28 +8,55 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.pay.opay.AccountInfo;
+import com.pay.opay.R;
+import com.pay.opay.TransferManager.TransferManager;
 import com.pay.opay.date.DateTimeHolder;
 import com.pay.opay.rotator.LoaderRotator;
-import com.pay.opay.R;
+import com.pay.opay.viewmodel.BankTransferViewModel;
 
 public class transactionreceipt extends AppCompatActivity {
 
-    AccountInfo accountInfo = AccountInfo.getInstance();
+    private final AccountInfo accountInfo = AccountInfo.getInstance();
+    private final DateTimeHolder dateTimeHolder = DateTimeHolder.getInstance();
+
+    private final Handler handler = new Handler(Looper.getMainLooper());
+
     private View rotatingFrame;
     private ViewGroup rootLayout, loader;
-    Handler handller = new Handler(Looper.getMainLooper());;
-    DateTimeHolder dateTimeHolder = DateTimeHolder.getInstance();
-    String Amount, Username, Useraccount, Rootaccount, Rootnumber, Datetime, Userbank, Rootbank;
-    TextView amountid, username, useraccount, rootaccount, rootnumber, datetime, userbank, rootbank;
+
+    private TextView amountid, username, useraccount, rootaccount, rootnumber, datetime;
+
+    private String Amount, Username, Useraccount, Userbank;
+    private String Rootaccount, Rootnumber, Rootbank, Datetime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.transaction_receipt);
 
+        initViews();
+        extractAccountInfo();
+        startLoader();
+        setupTextViews();
+    }
 
+    private void initViews() {
+        amountid = findViewById(R.id.amountid);
+        username = findViewById(R.id.username);
+        useraccount = findViewById(R.id.useraccount);
+        rootaccount = findViewById(R.id.rootname);
+        rootnumber = findViewById(R.id.rootaccount);
+        datetime = findViewById(R.id.datetime);
+
+        rootLayout = findViewById(R.id.rootlayout);
+        loader = findViewById(R.id.loader);
+        rotatingFrame = findViewById(R.id.rotatingBackground);
+    }
+
+    private void extractAccountInfo() {
         Amount = accountInfo.getAmount();
         Username = accountInfo.getUserAccount();
         Userbank = accountInfo.getUserBank();
@@ -36,35 +64,28 @@ public class transactionreceipt extends AppCompatActivity {
         Rootaccount = accountInfo.getRootAccount();
         Rootnumber = accountInfo.getRootNumber();
         Rootbank = accountInfo.getRootBank();
+        Datetime = dateTimeHolder.getFormattedDateTime();
+    }
 
-        String usercom = Userbank + " | " + Useraccount;
-        String rootcom = Rootbank + " | " + Rootnumber;
-
-        amountid = findViewById(R.id.amountid);
-        username = findViewById(R.id.username);
-        useraccount = findViewById(R.id.useraccount);
-        rootaccount = findViewById(R.id.rootname);
-        rootnumber = findViewById(R.id.rootaccount);
-        datetime = findViewById(R.id.datetime);
-        rootLayout = findViewById(R.id.rootlayout);
-        loader = findViewById(R.id.loader);
-        rotatingFrame = findViewById(R.id.rotatingBackground);
-
-
-        LoaderRotator rotator = new LoaderRotator(rotatingFrame, loader, rootLayout);
-        rotator.start();
-        // Stop after 2 seconds
-        Runnable stopRunnable = rotator::stop;
-
-        handller.postDelayed(stopRunnable, 2000);
+    @SuppressLint("SetTextI18n")
+    private void setupTextViews() {
+        String userCom = Userbank + " | " + Useraccount;
+        String rootCom = Rootbank + " | " + Rootnumber;
 
         amountid.setText("₦" + Amount);
         username.setText(Username);
-        useraccount.setText(usercom);
+        useraccount.setText(userCom);
         rootaccount.setText(Rootaccount);
-        rootnumber.setText(rootcom);
-
-        Datetime = dateTimeHolder.getFormattedDateTime();
+        rootnumber.setText(rootCom);
         datetime.setText(Datetime);
     }
+
+    private void startLoader() {
+        LoaderRotator rotator = new LoaderRotator(rotatingFrame, loader, rootLayout);
+        rotator.start();
+        handler.postDelayed(rotator::stop, 2000);
+    }
+
+
 }
+
