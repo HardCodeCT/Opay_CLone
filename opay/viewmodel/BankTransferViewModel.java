@@ -1,6 +1,9 @@
 package com.pay.opay.viewmodel;
 
 import android.app.Application;
+import android.os.Handler;
+import android.os.Looper;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
@@ -60,13 +63,11 @@ public class BankTransferViewModel extends AndroidViewModel {
 
     public void getLastTwoTransfersIfExists(LastTwoCallback callback) {
         executorService.execute(() -> {
-            int count = dao.getTransferCount();
-            if (count >= 1) {
-                List<BankTransfer> list = dao.getLastTwoTransfers();
-                BankTransfer first = list.size() > 0 ? list.get(0) : null;
-                BankTransfer second = list.size() > 1 ? list.get(1) : null;
-
-                callback.onResult(new LastTwoTransfersWrapper(first, second));
+            List<BankTransfer> list = dao.getLastTwoTransfers();
+            if (list.size() >= 2) {
+                callback.onResult(new LastTwoTransfersWrapper(list.get(0), list.get(1)));
+            } else if (list.size() == 1) {
+                callback.onResult(new LastTwoTransfersWrapper(list.get(0), null));
             } else {
                 callback.onNoEntries();
             }
@@ -92,6 +93,27 @@ public class BankTransferViewModel extends AndroidViewModel {
         });
     }
 
+    public interface SingleTransferCallback {
+        void onTransferLoaded(BankTransfer transfer);
+        void onError();
+    }
+
+    public void getTransferById(int id, SingleTransferCallback callback) {
+        executorService.execute(() -> {
+            try {
+                BankTransfer transfer = dao.getTransferById(id);
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    if (transfer != null) {
+                        callback.onTransferLoaded(transfer);
+                    } else {
+                        callback.onError();
+                    }
+                });
+            } catch (Exception e) {
+                new Handler(Looper.getMainLooper()).post(callback::onError);
+            }
+        });
+    }
 
 
 }

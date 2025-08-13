@@ -8,6 +8,8 @@ public class BankTransfer {
 
     @PrimaryKey(autoGenerate = true)
     public int id;
+
+    public int bankimage;
     public String senderName;
     public String accountNumber;
     public String bankName;

@@ -6,7 +6,7 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.util.Log;
 
-import com.pay.opay.AccountInfo;
+import com.pay.opay.AccountInfo.AccountInfo;
 
 import org.json.JSONObject;
 

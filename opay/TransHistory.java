@@ -1,5 +1,6 @@
 package com.pay.opay;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -15,8 +16,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.flexbox.FlexboxLayout;
+import com.pay.opay.AccountInfo.AccountInfo;
 import com.pay.opay.adapter.TransactionAdapter;
 import com.pay.opay.database.BankTransfer;
+import com.pay.opay.receipt.MainReceipt;
 import com.pay.opay.viewmodel.BankTransferViewModel;
 
 import java.util.ArrayList;
@@ -34,8 +37,8 @@ public class TransHistory extends AppCompatActivity {
     private boolean isAllStatusExpanded = false;
     private RecyclerView recyclerView;
     private TransactionAdapter adapter;
-    private BankTransferViewModel viewModel;
     private final List<TransactionModel> transactionList = new ArrayList<>();
+    private final AccountInfo accountInfo = AccountInfo.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,12 +48,41 @@ public class TransHistory extends AppCompatActivity {
         initViews();
         setupListeners();
         populateTags();
+        setupRecyclerView();
+        setupViewModel();
+    }
 
+    private void setupRecyclerView() {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new TransactionAdapter(transactionList);
-        recyclerView.setAdapter(adapter);
+        adapter.setOnItemClickListener(transaction -> {
+            int bankId = transaction.getID(); // Assuming TransactionModel has getID()
 
-        viewModel = new ViewModelProvider(this).get(BankTransferViewModel.class);
+            BankTransferViewModel bankTransferViewModel = new ViewModelProvider(this).get(BankTransferViewModel.class);
+            bankTransferViewModel.getTransferById(bankId, new BankTransferViewModel.SingleTransferCallback() {
+                @Override
+                public void onTransferLoaded(BankTransfer transfer) {
+                    accountInfo.setActivebank(transfer.bankimage);
+                    accountInfo.setAmount(transfer.amount);
+                    accountInfo.setUserAccount(transfer.senderName);
+                    accountInfo.setUserBank(transfer.bankName);
+                    accountInfo.setUserNumber(transfer.accountNumber);
+                    accountInfo.setLongDateTime(transfer.longdatetime);
+                    accountInfo.setShortDateTime(transfer.shortdatetime);
+                    startActivity(new Intent(TransHistory.this, MainReceipt.class));
+                }
+
+                @Override
+                public void onError() {
+                    // Handle case where transfer was not found
+                }
+            });
+        });
+        recyclerView.setAdapter(adapter);
+    }
+
+    private void setupViewModel() {
+        BankTransferViewModel viewModel = new ViewModelProvider(this).get(BankTransferViewModel.class);
         viewModel.getAllTransfers().observe(this, this::updateTransfers);
     }
 
@@ -164,6 +196,7 @@ public class TransHistory extends AppCompatActivity {
         transactionList.clear();
         for (BankTransfer bank : transfers) {
             transactionList.add(new TransactionModel(
+                    bank.id,
                     bank.senderName,           // ✅ Sender name from DB
                     bank.shortdatetime,        // ✅ Display-friendly date/time
                     bank.amount,               // ✅ Amount
@@ -172,5 +205,4 @@ public class TransHistory extends AppCompatActivity {
         }
         adapter.notifyDataSetChanged();
     }
-
 }

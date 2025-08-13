@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import androidx.core.content.res.ResourcesCompat;
 
-import com.pay.opay.AccountInfo;
+import com.pay.opay.AccountInfo.AccountInfo;
 import com.pay.opay.BankData;
 import com.pay.opay.R;
 

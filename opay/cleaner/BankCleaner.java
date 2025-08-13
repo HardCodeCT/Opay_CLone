@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.widget.AppCompatButton;
 
-import com.pay.opay.AccountInfo;
+import com.pay.opay.AccountInfo.AccountInfo;
 import com.pay.opay.R;
 
 public class BankCleaner {

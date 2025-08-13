@@ -10,25 +10,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.pay.opay.AccountInfo;
+import com.pay.opay.AccountInfo.AccountInfo;
 import com.pay.opay.BankData;
 import com.pay.opay.BankItem;
 import com.pay.opay.R;
-
 import java.util.List;
 
 public class BankAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final List<BankItem> itemList;
     private final BankData bankData = BankData.getInstance();
     private final AccountInfo accountInfo = AccountInfo.getInstance();
-
     private String query = "";
-
     public interface OnDataChangedListener {
         void onChanged();
     }
@@ -120,7 +114,7 @@ public class BankAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             bankHolder.imageBankLogo.setImageResource(item.getLogoResId());
 
             bankHolder.itemView.setOnClickListener(v -> {
-                handleBankSelected(item.getBankCode(), item.getName(), item.getLogoResId(), v.getContext());
+                handleBankSelected(item.getName() , item.getBankCode(), item.getName(), item.getLogoResId(), v.getContext());
 
                 if (itemClickListener != null) {
                     itemClickListener.onItemClick(item);
@@ -130,12 +124,13 @@ public class BankAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
 
-    private void handleBankSelected(String code, String fullName, int imageRes, Context context) {
+    private void handleBankSelected(String userbank, String code, String fullName, int imageRes, Context context) {
         //String firstWord = fullName.contains(" ") ? fullName.substring(0, fullName.indexOf(" ")) : fullName;
         bankData.setBankCode(code);
         bankData.setBankName(fullName);
         bankData.setBankImage(imageRes);
         accountInfo.setBankUpdate(4);
+        accountInfo.setUserBank(userbank);
         accountInfo.setActivebank(imageRes);
     }
 

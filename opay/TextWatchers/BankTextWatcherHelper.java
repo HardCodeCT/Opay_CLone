@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.pay.opay.viewmodel.BankContactViewModel;
 import com.pay.opay.database.BankName;
 import com.pay.opay.BankData;
-import com.pay.opay.AccountInfo;
+import com.pay.opay.AccountInfo.AccountInfo;
 import com.pay.opay.BankItem;
 import com.pay.opay.adapter.BankAdapter;
 import com.pay.opay.resolver.BankResolver;

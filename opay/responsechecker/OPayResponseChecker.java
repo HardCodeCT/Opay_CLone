@@ -4,7 +4,7 @@ import android.os.Handler;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.pay.opay.AccountInfo;
+import com.pay.opay.AccountInfo.AccountInfo;
 import com.pay.opay.R;
 import com.pay.opay.adapter.AccountAdapter;
 import com.pay.opay.animationhelper.AnimationUtilsHelper;

@@ -7,28 +7,22 @@ import android.os.Looper;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
 
-import com.pay.opay.AccountInfo;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.pay.opay.AccountInfo.AccountInfo;
 import com.pay.opay.R;
-import com.pay.opay.TransferManager.TransferManager;
 import com.pay.opay.date.DateTimeHolder;
 import com.pay.opay.rotator.LoaderRotator;
-import com.pay.opay.viewmodel.BankTransferViewModel;
 
 public class transactionreceipt extends AppCompatActivity {
 
     private final AccountInfo accountInfo = AccountInfo.getInstance();
     private final DateTimeHolder dateTimeHolder = DateTimeHolder.getInstance();
-
     private final Handler handler = new Handler(Looper.getMainLooper());
-
     private View rotatingFrame;
     private ViewGroup rootLayout, loader;
-
     private TextView amountid, username, useraccount, rootaccount, rootnumber, datetime;
-
     private String Amount, Username, Useraccount, Userbank;
     private String Rootaccount, Rootnumber, Rootbank, Datetime;
 
@@ -88,4 +82,3 @@ public class transactionreceipt extends AppCompatActivity {
 
 
 }
-

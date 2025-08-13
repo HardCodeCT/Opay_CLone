@@ -5,15 +5,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import com.pay.opay.AccountInfo.AccountInfo;
 import com.pay.opay.adapter.BankAdapter;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.BufferedReader;

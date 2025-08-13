@@ -6,10 +6,10 @@ import android.os.Handler;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.widget.AppCompatButton;
-
-import com.pay.opay.AccountInfo;
+import com.pay.opay.AccountInfo.AccountInfo;
 import com.pay.opay.R;
 import com.pay.opay.animationhelper.AnimationUtilsHelper;
 import com.pay.opay.straighttodeposit;
@@ -56,6 +56,7 @@ public class BankResponseChecker {
                         accountInfo.setResponse(0);
                         enableNextButton();
                         accountInfo.setAccountType("Bank");
+
                     }, 2000);
                 } else if (status == 2) {
                     AnimationUtilsHelper.stopRotating(centerIcon);

@@ -14,9 +14,18 @@ import java.util.List;
 public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.ViewHolder> {
 
     private List<TransactionModel> transactions;
+    private OnItemClickListener onItemClickListener;
 
     public TransactionAdapter(List<TransactionModel> transactions) {
         this.transactions = transactions;
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(TransactionModel transaction);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.onItemClickListener = listener;
     }
 
     @NonNull
@@ -34,6 +43,8 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         holder.date.setText(model.getDateTime());
         holder.amount.setText(model.getAmount());
         holder.status.setText(model.getStatus());
+
+        holder.bind(model, onItemClickListener);
     }
 
     @Override
@@ -51,8 +62,18 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             user = itemView.findViewById(R.id.user2);
             date = itemView.findViewById(R.id.datetime2);
             amount = itemView.findViewById(R.id.price2);
-            status = itemView.findViewById(R.id.status2); // Make sure you give the Status TextView an id in XML
+            status = itemView.findViewById(R.id.status2);
+        }
+
+        public void bind(final TransactionModel transaction, final OnItemClickListener listener) {
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (listener != null) {
+                        listener.onItemClick(transaction);
+                    }
+                }
+            });
         }
     }
 }
-

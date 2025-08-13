@@ -9,7 +9,7 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.pay.opay.AccountInfo;
+import com.pay.opay.AccountInfo.AccountInfo;
 import com.pay.opay.MainActivity;
 import com.pay.opay.R;
 import com.pay.opay.TransferManager.TransferManager;
@@ -17,10 +17,9 @@ import com.pay.opay.viewmodel.BankTransferViewModel;
 
 public class transfersuccessful extends AppCompatActivity {
 
-    private AccountInfo accountInfo = AccountInfo.getInstance();
+    private final AccountInfo accountInfo = AccountInfo.getInstance();
     private ViewGroup viewdeet, addfav, viewdet;
     private TextView amounttext;
-    private String Amount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +67,8 @@ public class transfersuccessful extends AppCompatActivity {
     }
 
     private void populateAmount() {
-        Amount = "₦" + accountInfo.getAmount() + ".00";
-        amounttext.setText(Amount);
+        String amount = "₦" + accountInfo.getAmount() + ".00";
+        amounttext.setText(amount);
     }
 
     private void handleBackPressed() {

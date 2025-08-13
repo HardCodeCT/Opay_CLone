@@ -32,10 +32,11 @@ public interface BankTransferDao {
 
     @Query("SELECT * FROM BankTransfer ORDER BY timestamp DESC LIMIT 2")
     List<BankTransfer> getLastTwoTransfers();
-
     @Query("SELECT * FROM BankTransfer ORDER BY timestamp DESC LIMIT 1")
     BankTransfer getLatestTransfer();
 
+    @Query("SELECT * FROM BankTransfer WHERE id = :id")
+    BankTransfer getTransferById(long id);
 
 
 }

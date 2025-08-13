@@ -8,12 +8,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.pay.opay.AccountInfo;
+import com.pay.opay.AccountInfo.AccountInfo;
 import com.pay.opay.R;
 import com.pay.opay.database.BankName;
 import com.pay.opay.straighttodeposit;
-
 import java.util.List;
 
 public class BankContactAdapter extends RecyclerView.Adapter<BankContactAdapter.ContactViewHolder> {
@@ -24,21 +22,21 @@ public class BankContactAdapter extends RecyclerView.Adapter<BankContactAdapter.
     }
 
     public static class ContactViewHolder extends RecyclerView.ViewHolder {
-        TextView tvName, tvPhone;
+        TextView tvName, tvPhone, tvBankname;
         ImageView imageView;
-
         public ContactViewHolder(View itemView) {
             super(itemView);
             tvName = itemView.findViewById(R.id.tvName);
             tvPhone = itemView.findViewById(R.id.tvPhone);
             imageView = itemView.findViewById(R.id.imageView);
+            tvBankname = itemView.findViewById(R.id.tvBankname);
         }
     }
 
     @NonNull
     @Override
     public ContactViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_contact, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recent_contact, parent, false);
         return new ContactViewHolder(view);
     }
 
@@ -48,12 +46,14 @@ public class BankContactAdapter extends RecyclerView.Adapter<BankContactAdapter.
 
         holder.tvName.setText(c.getAccountName());
         holder.tvPhone.setText(c.getBankNumber());
+        holder.tvBankname.setText(c.getBankName());
         holder.imageView.setImageResource(c.getImageName());
 
         holder.itemView.setOnClickListener(v -> {
-            AccountInfo.getInstance().setUserAccount(c.getBankName());
+            AccountInfo.getInstance().setUserAccount(c.getAccountName());
             AccountInfo.getInstance().setUserNumber(c.getBankNumber());
-            AccountInfo.getInstance().setUserBank("Access Bank");
+            AccountInfo.getInstance().setUserBank(c.getBankName());
+            AccountInfo.getInstance().setActivebank(c.getImageName());
             AccountInfo.getInstance().setRootAccount("ODOEGBULAM THANKGOD CHIGOZIE");
             AccountInfo.getInstance().setRootNumber("8165713623");
             AccountInfo.getInstance().setRootBank("OPay");
@@ -67,4 +67,5 @@ public class BankContactAdapter extends RecyclerView.Adapter<BankContactAdapter.
     public int getItemCount() {
         return contactList.size();
     }
+
 }

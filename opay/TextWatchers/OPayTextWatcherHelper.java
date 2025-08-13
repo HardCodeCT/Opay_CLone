@@ -9,7 +9,7 @@ import android.widget.EditText;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.pay.opay.AccountInfo;
+import com.pay.opay.AccountInfo.AccountInfo;
 import com.pay.opay.BankData;
 import com.pay.opay.adapter.AccountAdapter;
 import com.pay.opay.resolver.BankResolver;
