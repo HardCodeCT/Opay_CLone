@@ -9,6 +9,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.pay.opay.Models.OfferModel;
+
 import java.util.List;
 
 public class OfferCardAdapter extends RecyclerView.Adapter<OfferCardAdapter.OfferViewHolder> {

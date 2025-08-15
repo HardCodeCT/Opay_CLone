@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.flexbox.FlexboxLayout;
 import com.pay.opay.AccountInfo.AccountInfo;
+import com.pay.opay.Models.TransactionModel;
 import com.pay.opay.adapter.TransactionAdapter;
 import com.pay.opay.database.BankTransfer;
 import com.pay.opay.receipt.MainReceipt;

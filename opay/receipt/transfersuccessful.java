@@ -11,14 +11,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.pay.opay.AccountInfo.AccountInfo;
-import com.pay.opay.AmountRepository;
 import com.pay.opay.MainActivity;
 import com.pay.opay.R;
-import com.pay.opay.Terminator;
 import com.pay.opay.TransferManager.TransferManager;
 import com.pay.opay.viewmodel.BankTransferViewModel;
-
-import java.util.concurrent.Executors;
 
 public class transfersuccessful extends AppCompatActivity {
     private AccountInfo accountInfo;

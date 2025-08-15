@@ -84,7 +84,7 @@ public class BankAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             return new BankViewHolder(view);
         }
     }
-    
+
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {

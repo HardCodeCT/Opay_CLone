@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 
 import com.pay.opay.R;
-import com.pay.opay.Terminator;
+import com.pay.opay.terminator.Terminator;
 
 public class CardsFragment extends Fragment {
 
