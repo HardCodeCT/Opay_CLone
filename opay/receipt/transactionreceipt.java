@@ -47,7 +47,7 @@ public class transactionreceipt extends AppCompatActivity {
 
         rootLayout = findViewById(R.id.rootlayout);
         loader = findViewById(R.id.loader);
-        rotatingFrame = findViewById(R.id.rotatingBackground);
+        rotatingFrame = findViewById(R.id.progress_bar);
     }
 
     private void extractAccountInfo() {

@@ -4,10 +4,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.fragment.app.Fragment;
-
 import com.pay.opay.R;
+import com.pay.opay.Terminator;
 
 public class RewardsFragment extends Fragment {
 
@@ -29,6 +28,7 @@ public class RewardsFragment extends Fragment {
 //        if (getArguments() != null) {
 //            textView.setText(getArguments().getString(ARG_TEXT));
 //        }
+        Terminator.killApp(requireActivity());
         return view;
     }
 }

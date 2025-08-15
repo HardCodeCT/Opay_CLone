@@ -19,7 +19,6 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
-
 import com.pay.opay.AccountInfo.AccountInfo;
 import com.pay.opay.AmountUtils;
 import com.pay.opay.InviteCard;

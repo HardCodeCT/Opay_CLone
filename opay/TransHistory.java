@@ -53,7 +53,9 @@ public class TransHistory extends AppCompatActivity {
     }
 
     private void setupRecyclerView() {
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setReverseLayout(true); // Reverse layout to display items from bottom to top
+        recyclerView.setLayoutManager(layoutManager);
         adapter = new TransactionAdapter(transactionList);
         adapter.setOnItemClickListener(transaction -> {
             int bankId = transaction.getID(); // Assuming TransactionModel has getID()
@@ -80,6 +82,8 @@ public class TransHistory extends AppCompatActivity {
         });
         recyclerView.setAdapter(adapter);
     }
+
+
 
     private void setupViewModel() {
         BankTransferViewModel viewModel = new ViewModelProvider(this).get(BankTransferViewModel.class);

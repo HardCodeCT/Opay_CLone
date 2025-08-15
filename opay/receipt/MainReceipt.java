@@ -45,7 +45,7 @@ public class MainReceipt extends AppCompatActivity {
     private void initViews() {
         rootLayout = findViewById(R.id.rootlayout);
         loader = findViewById(R.id.loader);
-        rotatingFrame = findViewById(R.id.rotatingBackground);
+        rotatingFrame = findViewById(R.id.progress_bar);
 
         bankImage = findViewById(R.id.bankimage);
         goBack = findViewById(R.id.iv_back);

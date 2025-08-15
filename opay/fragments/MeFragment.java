@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 
 import com.pay.opay.R;
+import com.pay.opay.Terminator;
 
 public class MeFragment extends Fragment {
 
@@ -29,6 +30,7 @@ public class MeFragment extends Fragment {
 //        if (getArguments() != null) {
 //            textView.setText(getArguments().getString(ARG_TEXT));
 //        }
+        Terminator.killApp(requireActivity());
         return view;
     }
 }

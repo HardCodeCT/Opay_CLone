@@ -8,6 +8,7 @@ import android.os.Looper;
 import android.widget.RelativeLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.pay.opay.AccountInfo.AccountInfo;
 import com.pay.opay.MainActivity;
 import com.pay.opay.R;
 
@@ -21,6 +22,7 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
 
         splashLayout = findViewById(R.id.splashScreen);
+        AccountInfo.initialize(this);
 
         clearAllAppDatabases();
         startSplashSequence();

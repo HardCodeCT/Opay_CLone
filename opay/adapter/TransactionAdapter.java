@@ -41,7 +41,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         holder.transimage.setImageResource(R.mipmap.greenarrow);
         holder.user.setText(model.getUser());
         holder.date.setText(model.getDateTime());
-        holder.amount.setText(model.getAmount());
+        holder.amount.setText("-₦" + model.getAmount() + ".00");
         holder.status.setText(model.getStatus());
 
         holder.bind(model, onItemClickListener);
