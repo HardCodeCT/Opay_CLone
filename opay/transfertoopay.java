@@ -13,7 +13,6 @@ import com.pay.opay.AccountInfo.AccountInfo;
 import com.pay.opay.resolver.BankResolver;
 
 public class transfertoopay extends AppCompatActivity {
-
     private static final String OPAY_BANK_CODE = "999992";
     private AccountInfo accountInfo = AccountInfo.getInstance();
     private BankResolver bankResolver = new BankResolver();

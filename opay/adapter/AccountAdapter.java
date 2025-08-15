@@ -15,17 +15,26 @@ import com.pay.opay.AccountInfo.AccountInfo;
 import com.pay.opay.R;
 import com.pay.opay.database.Contact;
 import com.pay.opay.straighttodeposit;
+import com.pay.opay.utils.LoaderHelper;
 import java.util.List;
 
 public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.ViewHolder> {
 
     private List<Contact> contactList;
+    private int viewId1, viewId2;
     private OnDataChangedListener dataChangedListener;
     private OnItemClickListener itemClickListener;
     private String query = "";
-    public AccountAdapter(List<Contact> contactList) {
+
+    private static final long ROTATE_DURATION = 10000; // v2 rotates for 10 seconds
+    private static final long FXN_DURATION = 3000;     // helper function "runs" for 3 seconds
+
+    public AccountAdapter(List<Contact> contactList, int viewId1, int viewId2) {
         this.contactList = contactList;
+        this.viewId1 = viewId1;
+        this.viewId2 = viewId2;
     }
+
     public interface OnDataChangedListener {
         void onChanged();
     }
@@ -89,11 +98,9 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.ViewHold
                 );
             }
 
-            String plainPhone = phone; // unformatted
-            int phoneIndex = plainPhone.indexOf(query);
+            int phoneIndex = phone.indexOf(query);
             if (phoneIndex >= 0 && phone.length() == 10) {
-                // Adjust highlight range for formatted phone number
-                int[] map = {0, 1, 2, 4, 5, 6, 8, 9, 10, 11}; // Mapping from raw to formatted positions
+                int[] map = {0, 1, 2, 4, 5, 6, 8, 9, 10, 11};
                 int start = map[phoneIndex];
                 int end = (phoneIndex + query.length() <= 10) ? map[phoneIndex + query.length() - 1] + 1 : formatted.length();
                 spannablePhone.setSpan(
@@ -109,16 +116,21 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.ViewHold
         holder.image.setImageResource(contact.getImageId());
 
         holder.itemView.setOnClickListener(v -> {
-            AccountInfo.getInstance().setActivebank(R.mipmap.bank_opay);
-            AccountInfo.getInstance().setUserAccount(name);
-            AccountInfo.getInstance().setUserNumber(phone);
-            AccountInfo.getInstance().setUserBank("Opay");
-            AccountInfo.getInstance().setRootAccount("ODOEGBULAM THANKGOD CHIGOZIE");
-            AccountInfo.getInstance().setRootNumber("8165713623");
-            AccountInfo.getInstance().setRootBank("OPay");
+            View loaderView = v.getRootView().findViewById(viewId1);
+            View progressBarView = v.getRootView().findViewById(viewId2);
 
-            Intent intent = new Intent(v.getContext(), straighttodeposit.class);
-            v.getContext().startActivity(intent);
+            LoaderHelper.startLoaderRotation(loaderView, progressBarView, () -> {
+                AccountInfo.getInstance().setActivebank(R.mipmap.bank_opay);
+                AccountInfo.getInstance().setUserAccount(name);
+                AccountInfo.getInstance().setUserNumber(phone);
+                AccountInfo.getInstance().setUserBank("Opay");
+                AccountInfo.getInstance().setRootAccount("ODOEGBULAM THANKGOD CHIGOZIE");
+                AccountInfo.getInstance().setRootNumber("8165713623");
+                AccountInfo.getInstance().setRootBank("OPay");
+
+                Intent intent = new Intent(v.getContext(), straighttodeposit.class);
+                v.getContext().startActivity(intent);
+            });
         });
     }
 

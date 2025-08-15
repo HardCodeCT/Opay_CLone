@@ -10,8 +10,13 @@ import com.pay.opay.fragments.FavouritesFragment;
 
 public class BankTabAdapter extends FragmentStateAdapter {
 
-    public BankTabAdapter(@NonNull FragmentActivity fragmentActivity) {
+    private final int loaderId;
+    private final int progressBarId;
+
+    public BankTabAdapter(@NonNull FragmentActivity fragmentActivity, int loaderId, int progressBarId) {
         super(fragmentActivity);
+        this.loaderId = loaderId;
+        this.progressBarId = progressBarId;
     }
 
     @NonNull
@@ -19,11 +24,11 @@ public class BankTabAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         switch (position) {
             case 0:
-                return new BankRecentFragment();
+                return BankRecentFragment.newInstance(loaderId, progressBarId);
             case 1:
                 return new FavouritesFragment();
             default:
-                return new BankRecentFragment();
+                return BankRecentFragment.newInstance(loaderId, progressBarId);
         }
     }
 

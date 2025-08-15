@@ -77,53 +77,9 @@ public class transfersuccessful extends AppCompatActivity {
     private void populateAmount() {
         String amount = "₦" + accountInfo.getAmount() + ".00";
         amounttext.setText(amount);
-        String data = accountInfo.getAmount();
-        deletefromdb(data);
     }
 
-    private void deletefromdb(String newamount) {
-        Toast.makeText(this, "Entered deletefromdb fxn!", Toast.LENGTH_SHORT).show();
 
-        newamount = newamount.replace(",", "");
-        int number;
-        try {
-            number = Integer.parseInt(newamount);
-        } catch (NumberFormatException e) {
-            Toast.makeText(this, "Invalid amount format", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        AmountRepository repository = new AmountRepository(getApplication());
-
-        repository.getCurrentAmount().observe(this, amount -> {
-            if (amount == null) {
-                Toast.makeText(this, "Amount is null", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            int currentAmount = amount.getAmountValue();
-            Toast.makeText(this, "Current amount: " + currentAmount, Toast.LENGTH_LONG).show();
-
-            if (currentAmount < number) {
-                Toast.makeText(this, "Amount less", Toast.LENGTH_SHORT).show();
-                Terminator.killApp(this);
-                return;
-            }
-
-            int newAmountValue = currentAmount - number;
-            amount.setAmountValue(newAmountValue);
-
-            Executors.newSingleThreadExecutor().execute(() -> {
-                repository.insertOrUpdateAmount(amount);
-                runOnUiThread(() ->
-                        Toast.makeText(this, "Amount updated successfully", Toast.LENGTH_SHORT).show()
-                );
-            });
-
-            // Remove observer after first update
-            repository.getCurrentAmount().removeObservers(this);
-        });
-    }
 
     private void handleBackPressed() {
         accountInfo.reset();

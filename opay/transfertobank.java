@@ -66,6 +66,8 @@ public class transfertobank extends AppCompatActivity {
     RecyclerHeightAdjuster adjuster;
     BankResponseChecker checker;
     private BankUpdateWatcher bankUpdateWatcher;
+    private View rotatingFrame;
+    private ViewGroup loader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +77,7 @@ public class transfertobank extends AppCompatActivity {
 
         contactViewModel = new ViewModelProvider(this).get(BankContactViewModel.class);
 
-        tabAdapter = new BankTabAdapter(this);
+        tabAdapter = new BankTabAdapter(this, R.id.loader, R.id.progress_bar);
         viewPager.setAdapter(tabAdapter);
 
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
@@ -149,7 +151,6 @@ public class transfertobank extends AppCompatActivity {
             bankselector.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         }
     }
-
     private void setupInitView() {
         selectbank = findViewById(R.id.selectbank);
         bankselector = findViewById(R.id.bankselector);
@@ -168,6 +169,10 @@ public class transfertobank extends AppCompatActivity {
         searching = findViewById(R.id.searching);
         accountinput = findViewById(R.id.accountinput);
         accountRecycler = findViewById(R.id.accountRecycler);
+        loader = findViewById(R.id.loader);
+        rotatingFrame = findViewById(R.id.progress_bar);
+
+
         accountRecycler.setLayoutManager(new LinearLayoutManager(this));
         accountRecycler.setHasFixedSize(true);
         accountList = new ArrayList<>();

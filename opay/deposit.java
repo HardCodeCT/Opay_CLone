@@ -44,6 +44,8 @@ public class deposit extends AppCompatActivity {
     private AccountInfo accountInfo = AccountInfo.getInstance();
     private BankResolver bankResolver = new BankResolver();
     private ViewGroup searching, dont, flag, accountdet, recyclerparent;
+    private View rotatingFrame;
+    private ViewGroup  loader;
     private EditText opayaccount;
     private ImageView updateimage, reload;
     private Handler handler = new Handler(Looper.getMainLooper());
@@ -56,7 +58,6 @@ public class deposit extends AppCompatActivity {
     ResolveAccountName retrieveAccountName;
     RecyclerHeightAdjuster adjuster;
     OPayResponseChecker checker;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,7 +87,7 @@ public class deposit extends AppCompatActivity {
 
         setupTouchInterceptor();
 
-        tabAdapter = new TabAdapter(this);
+        tabAdapter = new TabAdapter(this, R.id.loader, R.id.progress_bar);
         viewPager.setAdapter(tabAdapter);
         viewPager.setOffscreenPageLimit(2);
 
@@ -100,16 +101,13 @@ public class deposit extends AppCompatActivity {
 
         iv_back.setOnClickListener(v -> finish());
 
-
-
     }
+
     @Override
     protected void onResume() {
         super.onResume();
         resetUI();
     }
-
-
 
     private void resetUI() {
         opayaccount.setText("");
@@ -133,18 +131,19 @@ public class deposit extends AppCompatActivity {
         recyclerparent = findViewById(R.id.recyclerparent);
         rootLayout = findViewById(R.id.rootLayout);
         reload = findViewById(R.id.end_icon);
+        loader = findViewById(R.id.loader);
+        rotatingFrame = findViewById(R.id.progress_bar);
 
         accountRecycler = findViewById(R.id.accountRecycler);
         accountRecycler.setLayoutManager(new LinearLayoutManager(this));
         accountRecycler.setHasFixedSize(true);
         accountList = new ArrayList<>();
-        accountAdapter = new AccountAdapter(accountList);
+        accountAdapter = new AccountAdapter(accountList, R.id.loader, R.id.progress_bar);
         accountRecycler.setAdapter(accountAdapter);
         adjuster = new RecyclerHeightAdjuster(this, accountRecycler, accountAdapter);
         adjuster.setupDynamicHeight();
 
     }
-
 
     private void resolveWithBankResolver(String input) {
         opayaccount.setEnabled(true);
@@ -159,7 +158,6 @@ public class deposit extends AppCompatActivity {
 
         }).start();
     }
-
 
     @SuppressLint("ClickableViewAccessibility")
     private void setupTouchInterceptor() {

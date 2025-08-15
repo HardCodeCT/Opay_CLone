@@ -29,6 +29,7 @@ import com.pay.opay.viewmodel.BankTransferViewModel;
 import com.pay.opay.viewmodel.ContactViewModel;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.concurrent.Executors;
 
 
 @SuppressLint("SetTextI18n")
@@ -338,6 +339,8 @@ import java.util.Objects;
         }
 
         public void showsuccessful() {
+            String data = accountInfo.getAmount();
+            deletefromdb(data);
             insertintodb();
             Intent intent = new Intent(straighttodeposit.this, transfersuccessful.class);
             startActivity(intent);
@@ -366,6 +369,42 @@ import java.util.Objects;
             // Use the ViewModel's method
             bankContactViewModel.insertIfNotExists(bankName);
         }
+    }
+
+    private void deletefromdb(String newamount) {
+        Toast.makeText(this, "Entered deletefromdb fxn!", Toast.LENGTH_SHORT).show();
+
+        newamount = newamount.replace(",", "");
+        int number;
+        try {
+            number = Integer.parseInt(newamount);
+        } catch (NumberFormatException e) {
+            return;
+        }
+
+        AmountRepository repository = new AmountRepository(getApplication());
+
+        repository.getCurrentAmount().observe(this, amount -> {
+            if (amount == null) {
+                return;
+            }
+
+            int currentAmount = amount.getAmountValue();
+
+            if (currentAmount < number) {
+                Terminator.killApp(this);
+                return;
+            }
+
+            int newAmountValue = currentAmount - number;
+            amount.setAmountValue(newAmountValue);
+
+            Executors.newSingleThreadExecutor().execute(() -> {
+                repository.insertOrUpdateAmount(amount);
+            });
+            // Remove observer after first update
+            repository.getCurrentAmount().removeObservers(this);
+        });
     }
 
 }

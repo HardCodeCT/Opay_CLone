@@ -10,8 +10,13 @@ import com.pay.opay.fragments.RecentsFragment;
 
 public class TabAdapter extends FragmentStateAdapter {
 
-    public TabAdapter(@NonNull FragmentActivity fragmentActivity) {
+    private final int loaderId;
+    private final int progressBarId;
+
+    public TabAdapter(@NonNull FragmentActivity fragmentActivity, int loaderId, int progressBarId) {
         super(fragmentActivity);
+        this.loaderId = loaderId;
+        this.progressBarId = progressBarId;
     }
 
     @NonNull
@@ -19,11 +24,11 @@ public class TabAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         switch (position) {
             case 0:
-                return new RecentsFragment();
+                return RecentsFragment.newInstance(loaderId, progressBarId);
             case 1:
-                return new FavouritesFragment();
+                return new FavouritesFragment(); // if needed
             default:
-                return new RecentsFragment();
+                return RecentsFragment.newInstance(loaderId, progressBarId);
         }
     }
 
