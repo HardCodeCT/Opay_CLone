@@ -3,7 +3,6 @@ package com.pay.opay;
 public class BankItem {
     public static final int TYPE_HEADER = 0;
     public static final int TYPE_BANK = 1;
-
     private int type;
     private String name;
     private int logoResId;

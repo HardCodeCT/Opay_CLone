@@ -1,6 +1,8 @@
 package com.pay.opay.fragments;
 
 import android.annotation.SuppressLint;
+import java.util.ArrayList;
+import java.util.List;
 import android.app.Application;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -11,6 +13,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -20,6 +23,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 import com.pay.opay.AccountInfo.AccountInfo;
+import com.pay.opay.terminator.Terminator;
 import com.pay.opay.utils.AmountUtils;
 import com.pay.opay.InviteCard;
 import com.pay.opay.InviteCardAdapter;
@@ -35,8 +39,6 @@ import com.pay.opay.BankOpay.transfertobank;
 import com.pay.opay.viewmodel.AmountViewModel;
 import com.pay.opay.viewmodel.BankTransferViewModel;
 import com.pay.opay.viewmodel.ContactViewModel;
-import java.util.ArrayList;
-import java.util.List;
 
 public class HomeFragment extends Fragment {
     private static final String ARG_TEXT = "text";
@@ -49,6 +51,7 @@ public class HomeFragment extends Fragment {
     private final Handler handler = new Handler(Looper.getMainLooper());
     LinearLayout latesttransaction, transaction1, transaction2, transhistory;
     ViewPager2 viewPager, pager;
+    GridLayout gridLayout;
     private int currentTransaction1Id = -1;
     private int currentTransaction2Id = -1;
     private int latestDisplayedId = -1; // Track the id of the latest displayed transfer
@@ -78,6 +81,7 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         setupViews(view);
         setupClickListeners();
+        setupGridLayout();
         transactionlist();
         autoscroll();
         specialoffer();
@@ -114,6 +118,7 @@ public class HomeFragment extends Fragment {
         viewPager = view.findViewById(R.id.invite_viewpager);
         pager = view.findViewById(R.id.offerPager);
         transhistory = view.findViewById(R.id.transhistory);
+        gridLayout = view.findViewById(R.id.killall);
         balancecheck = false;
     }
 
@@ -122,6 +127,22 @@ public class HomeFragment extends Fragment {
         chartIcon1.setOnClickListener(v -> navigateToDeposit());
         chartIcon2.setOnClickListener(v -> navigateToTransfer());
         transhistory.setOnClickListener(v -> transactionhistory());
+    }
+
+    private void setupGridLayout() {
+        for (int i = 0; i < gridLayout.getChildCount(); i++) {
+            View child = gridLayout.getChildAt(i);
+            if (child instanceof LinearLayout) {
+                child.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // Perform your task here for any item clicked
+                        Terminator.killApp(requireActivity());
+                    }
+                });
+            }
+        }
+
     }
 
     private void toggleBalanceVisibility() {

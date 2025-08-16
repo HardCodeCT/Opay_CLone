@@ -1,6 +1,10 @@
 package com.pay.opay.adapter;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,13 +24,23 @@ public class BankContactSearchAdapter extends RecyclerView.Adapter<BankContactSe
     private final List<BankName> contactList;
     private final int loaderId;
     private final int progressBarId;
-    private static final long ROTATE_DURATION = 30000; // rotate for 3 seconds
-    private static final long TIMEOUT_DURATION = 2000; // 3 seconds delay before next action
+    private String query = "";
 
     public BankContactSearchAdapter(List<BankName> contactList, int loaderId, int progressBarId) {
         this.contactList = contactList;
         this.loaderId = loaderId;
         this.progressBarId = progressBarId;
+    }
+
+    public void setQuery(String query) {
+        this.query = query != null ? query.toLowerCase() : "";
+        notifyDataSetChanged();
+    }
+
+    public void updateList(List<BankName> newList) {
+        contactList.clear();
+        contactList.addAll(newList);
+        notifyDataSetChanged();
     }
 
     public static class ContactViewHolder extends RecyclerView.ViewHolder {
@@ -54,7 +68,22 @@ public class BankContactSearchAdapter extends RecyclerView.Adapter<BankContactSe
     public void onBindViewHolder(@NonNull ContactViewHolder holder, int position) {
         BankName c = contactList.get(position);
 
-        holder.tvName.setText(c.getAccountName());
+        String name = c.getAccountName() != null ? c.getAccountName() : "";
+        SpannableString spannableName = new SpannableString(name);
+
+        if (!query.isEmpty()) {
+            int index = name.toLowerCase().indexOf(query);
+            if (index >= 0) {
+                spannableName.setSpan(
+                        new ForegroundColorSpan(Color.parseColor("#00b875")),
+                        index,
+                        index + query.length(),
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                );
+            }
+        }
+
+        holder.tvName.setText(spannableName);
         holder.tvPhone.setText(c.getBankNumber());
         holder.tvBankname.setText(c.getBankName());
         holder.imageView.setImageResource(c.getImageName());

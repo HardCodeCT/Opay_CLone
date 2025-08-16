@@ -6,20 +6,14 @@ import android.view.View;
 import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.pay.opay.viewmodel.BankContactViewModel;
-import com.pay.opay.database.BankName;
-import com.pay.opay.BankData;
 import com.pay.opay.AccountInfo.AccountInfo;
-import com.pay.opay.BankItem;
-import com.pay.opay.adapter.BankAdapter;
-import com.pay.opay.resolver.BankResolver;
+import com.pay.opay.BankData;
+import com.pay.opay.adapter.BankContactSearchAdapter;
 import com.pay.opay.cleaner.BankCleaner;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.pay.opay.resolver.BankResolver;
+import com.pay.opay.viewmodel.BankContactViewModel;
 
 public class BankTextWatcherHelper {
 
@@ -30,7 +24,7 @@ public class BankTextWatcherHelper {
             View recyclerParent,
             RecyclerView accountRecycler,
             BankContactViewModel contactViewModel,
-            BankAdapter bankAdapter,
+            BankContactSearchAdapter bankAdapter,
             BankData bankData,
             AccountInfo accountInfo,
             BankResolver bankResolver,
@@ -59,60 +53,43 @@ public class BankTextWatcherHelper {
                 if (input.length() < 10) {
                     if (wasTenDigits) {
                         wasTenDigits = false;
-                        cleaner.clean(); // reset UI when dropping from 10+ to <10
+                        cleaner.clean();
                     }
 
-                    contactViewModel.getContactsMatching(input).observe((LifecycleOwner) activity, matchedBanks -> {
+                    contactViewModel.getContactsMatching(input).observe(activity, matchedBanks -> {
                         if (matchedBanks != null && !matchedBanks.isEmpty()) {
                             recyclerParent.setVisibility(View.VISIBLE);
                             accountRecycler.setVisibility(View.VISIBLE);
                             bankAdapter.setQuery(input);
-
-                            List<BankItem> bankItems = new ArrayList<>();
-                            for (BankName bank : matchedBanks) {
-                                bankItems.add(new BankItem(
-                                        bank.getBankName(),
-                                        bank.getImageName(),
-                                        bank.getBankNumber()
-                                ));
-                            }
-
-                            bankAdapter.updateList(bankItems);
+                            bankAdapter.updateList(matchedBanks); // pass BankName list directly
                         } else {
                             recyclerParent.setVisibility(View.GONE);
                             accountRecycler.setVisibility(View.GONE);
                         }
                     });
+
                 } else if (input.length() == 10) {
                     wasTenDigits = true;
-                    contactViewModel.getContactByPhone(input).observe((LifecycleOwner) activity, contacts -> {
+                    contactViewModel.getContactByPhone(input).observe(activity, contacts -> {
                         if (contacts != null && !contacts.isEmpty()) {
                             recyclerParent.setVisibility(View.VISIBLE);
                             accountRecycler.setVisibility(View.VISIBLE);
                             bankAdapter.setQuery(input);
-
-                            List<BankItem> bankItems = new ArrayList<>();
-                            for (BankName bank : contacts) {
-                                bankItems.add(new BankItem(
-                                        bank.getBankName(),
-                                        bank.getImageName(),
-                                        bank.getBankNumber()
-                                ));
-                            }
-
-                            bankAdapter.updateList(bankItems);
+                            bankAdapter.updateList(contacts); // pass BankName list directly
                         } else {
                             accountInfo.setUserNumber(input);
                             resolveWithBankRunnable.run();
                         }
                     });
-                } else {
-                    // input > 10, do nothing
                 }
             }
 
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void afterTextChanged(Editable s) {}
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {}
         });
     }
 }
+

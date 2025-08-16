@@ -27,9 +27,11 @@ import com.pay.opay.BankUpdate.BankUpdateWatcher;
 import com.pay.opay.R;
 import com.pay.opay.TextWatchers.BankTextWatcherHelper;
 import com.pay.opay.adapter.BankAdapter;
+import com.pay.opay.adapter.BankContactSearchAdapter;
 import com.pay.opay.adapter.BankTabAdapter;
 import com.pay.opay.animationhelper.AnimationUtilsHelper;
 import com.pay.opay.cleaner.BankCleaner;
+import com.pay.opay.database.BankName;
 import com.pay.opay.recyclerheightadjuster.RecyclerHeightAdjuster;
 import com.pay.opay.resolver.BankResolver;
 import com.pay.opay.responsechecker.BankResponseChecker;
@@ -40,12 +42,11 @@ import java.util.List;
 public class transfertobank extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager2 viewPager;
-    private BankTabAdapter tabAdapter;
     AccountInfo accountInfo = AccountInfo.getInstance();
     TextView bankselector;
     TextView centerText;
     ImageView rightt, bankimage;
-    private BankResolver bankResolver = new BankResolver();
+    private final BankResolver bankResolver = new BankResolver();
     View patch;
     ViewGroup selectbank, bankloaded, searching, recyclerparent;
     EditText accountinput;
@@ -62,6 +63,8 @@ public class transfertobank extends AppCompatActivity {
     private RecyclerView accountRecycler;
     private BankContactViewModel contactViewModel;
     private BankAdapter bankAdapter;
+    private BankContactSearchAdapter bankContactSearchAdapter;
+    private BankContactViewModel bankContactViewModel;
     String accountName;
     Integer okay = 0;
     int filled;
@@ -71,16 +74,20 @@ public class transfertobank extends AppCompatActivity {
     private BankUpdateWatcher bankUpdateWatcher;
     private View rotatingFrame;
     private ViewGroup loader;
+    private final List<BankName> bankList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.deposittobank);
-        setupInitView();
 
         contactViewModel = new ViewModelProvider(this).get(BankContactViewModel.class);
+        bankContactViewModel = new ViewModelProvider(this).get(BankContactViewModel.class);
 
-        tabAdapter = new BankTabAdapter(this, R.id.loader, R.id.progress_bar);
+        setupInitView();
+
+
+        BankTabAdapter tabAdapter = new BankTabAdapter(this, R.id.loader, R.id.progress_bar);
         viewPager.setAdapter(tabAdapter);
 
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
@@ -103,19 +110,19 @@ public class transfertobank extends AppCompatActivity {
                 this, handler, accountInfo, bankData, bankimage, bankselector,
                 () -> okay++ // callback when bank update is completed
         );
+
         bankUpdateWatcher.start();
 
         BankCleaner cleaner = new BankCleaner(this, searching, centerIcon, centerText, bankimage, bankselector, nextButton);
 
         BankTextWatcherHelper.setupAccountTextWatcher(
-                this, accountinput, searching, recyclerparent, accountRecycler, contactViewModel, bankAdapter, bankData, accountInfo, bankResolver, centerIcon, centerText, patch,
+                this, accountinput, searching, recyclerparent, accountRecycler, contactViewModel, bankContactSearchAdapter, bankData, accountInfo, bankResolver, centerIcon, centerText, patch,
                 () -> resolveWithBankResolver(accountinput.getText().toString().trim()),
                 cleaner
         );
 
         iv_back.setOnClickListener(v -> finish());
     }
-
 
     @Override
     protected void onResume() {
@@ -154,6 +161,8 @@ public class transfertobank extends AppCompatActivity {
             bankselector.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         }
     }
+
+
     private void setupInitView() {
         selectbank = findViewById(R.id.selectbank);
         bankselector = findViewById(R.id.bankselector);
@@ -178,8 +187,15 @@ public class transfertobank extends AppCompatActivity {
         accountRecycler.setLayoutManager(new LinearLayoutManager(this));
         accountRecycler.setHasFixedSize(true);
         accountList = new ArrayList<>();
-        bankAdapter = new BankAdapter(accountList);
-        accountRecycler.setAdapter(bankAdapter);
+        bankContactSearchAdapter = new BankContactSearchAdapter(bankList, R.id.loader, R.id.progress_bar);
+        accountRecycler.setAdapter(bankContactSearchAdapter);
+        bankContactViewModel.getAllBanks().observe(this, banksFromDb -> {
+            bankList.clear();
+            bankList.addAll(banksFromDb);
+            bankContactSearchAdapter.notifyDataSetChanged();
+        });
+
+
         nextButton = findViewById(R.id.next_button);
         adjuster = new RecyclerHeightAdjuster(this, accountRecycler, bankAdapter);
         adjuster.setupDynamicHeight();
