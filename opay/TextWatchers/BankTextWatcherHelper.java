@@ -4,10 +4,8 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.pay.opay.AccountInfo.AccountInfo;
 import com.pay.opay.BankData;
 import com.pay.opay.adapter.BankContactSearchAdapter;

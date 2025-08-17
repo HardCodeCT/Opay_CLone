@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.view.animation.RotateAnimation;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
@@ -18,12 +19,14 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
+import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.pay.opay.AccountInfo.AccountInfo;
 import com.pay.opay.BankData;
 import com.pay.opay.BankItem;
 import com.pay.opay.BankUpdate.BankUpdateWatcher;
+import com.pay.opay.ImageSwitcher.ImageSwitcherUtil;
 import com.pay.opay.R;
 import com.pay.opay.TextWatchers.BankTextWatcherHelper;
 import com.pay.opay.adapter.BankAdapter;
@@ -43,7 +46,7 @@ public class transfertobank extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager2 viewPager;
     AccountInfo accountInfo = AccountInfo.getInstance();
-    TextView bankselector;
+    TextView bankselector, cardConfirm, cardName, cardBank, CardAccount;
     TextView centerText;
     ImageView rightt, bankimage;
     private final BankResolver bankResolver = new BankResolver();
@@ -55,7 +58,7 @@ public class transfertobank extends AppCompatActivity {
     private Runnable checkOkayRunnable;
     private Handler handler = new Handler(Looper.getMainLooper());
     private Handler  andler = new Handler(Looper.getMainLooper());
-    private ImageView centerIcon, iv_back;
+    private ImageView centerIcon, iv_back, Cardbankimage;
     private RotateAnimation rotateAnimation;
     private final BankData bankData = BankData.getInstance();  // ✅ Use singleton here
     private View rootLayout;
@@ -75,6 +78,9 @@ public class transfertobank extends AppCompatActivity {
     private View rotatingFrame;
     private ViewGroup loader;
     private final List<BankName> bankList = new ArrayList<>();
+    ShapeableImageView imageView;
+    private ImageSwitcherUtil imageSwitcher;
+    LinearLayout confirmRoot;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +91,17 @@ public class transfertobank extends AppCompatActivity {
         bankContactViewModel = new ViewModelProvider(this).get(BankContactViewModel.class);
 
         setupInitView();
+
+        imageSwitcher = new ImageSwitcherUtil(
+                imageView,
+                6000,
+                R.drawable.opay,
+                R.drawable.bang,
+                R.drawable.xbet,
+                R.drawable.ilotadvert
+        );
+
+        imageSwitcher.startSwitching();
 
 
         BankTabAdapter tabAdapter = new BankTabAdapter(this, R.id.loader, R.id.progress_bar);
@@ -183,6 +200,14 @@ public class transfertobank extends AppCompatActivity {
         accountRecycler = findViewById(R.id.accountRecycler);
         loader = findViewById(R.id.loader);
         rotatingFrame = findViewById(R.id.progress_bar);
+        imageView = findViewById(R.id.switchableImageView);
+        confirmRoot = findViewById(R.id.confirmroot);
+        cardConfirm = findViewById(R.id.cardConfirm);
+        cardName = findViewById(R.id.cardName);
+        cardBank = findViewById(R.id.cardBank);
+        CardAccount = findViewById(R.id.CardAccount);
+        Cardbankimage = findViewById(R.id.Cardbankimage);
+
 
         accountRecycler.setLayoutManager(new LinearLayoutManager(this));
         accountRecycler.setHasFixedSize(true);
@@ -215,7 +240,8 @@ public class transfertobank extends AppCompatActivity {
 
                     new Thread(() -> {
                         bankResolver.resolveAccountName(transfertobank.this, input, bankData.getBankCode());
-                        checker = new BankResponseChecker(transfertobank.this, handler, accountInfo, centerIcon, centerText, searching, nextButton
+                        checker = new BankResponseChecker(transfertobank.this, handler, accountInfo, centerIcon, centerText, searching, nextButton, confirmRoot, cardConfirm,
+                                cardName, cardBank, CardAccount, Cardbankimage, loader, rotatingFrame
                         );
                         checker.check();
 

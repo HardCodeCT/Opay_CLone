@@ -89,6 +89,8 @@ public class BankContactSearchAdapter extends RecyclerView.Adapter<BankContactSe
         holder.imageView.setImageResource(c.getImageName());
 
         holder.itemView.setOnClickListener(v -> {
+            AccountInfo.getInstance().setAlreadyset("set");
+
             View loaderView = v.getRootView().findViewById(loaderId);
             View progressBarView = v.getRootView().findViewById(progressBarId);
 

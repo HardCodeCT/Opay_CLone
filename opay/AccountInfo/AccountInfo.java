@@ -23,6 +23,8 @@ public class AccountInfo {
     private String rootNumber;
     private String userBank;
     private String rootBank;
+
+    private String alreadyset;
     private int Response;
     private int bankUpdate;
     private int activebank;
@@ -138,6 +140,7 @@ public class AccountInfo {
         accountType = null;
         shortdatetime = null;
         longdatetime = null;
+        alreadyset = null;
         Response = 0;
         bankUpdate = 0;
         activebank = 0;
@@ -272,5 +275,13 @@ public class AccountInfo {
     public synchronized void setShortDateTime(String shortdatetime) {
         this.shortdatetime = shortdatetime;
         saveToPreferences();
+    }
+
+    public String getAlreadyset() {
+        return alreadyset;
+    }
+
+    public void setAlreadyset(String alreadyset) {
+        this.alreadyset = alreadyset;
     }
 }

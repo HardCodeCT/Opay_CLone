@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 import com.pay.opay.AccountInfo.AccountInfo;
@@ -16,6 +17,9 @@ import com.pay.opay.R;
 import com.pay.opay.database.Contact;
 import com.pay.opay.straighttodeposit;
 import com.pay.opay.utils.LoaderHelper;
+
+import org.w3c.dom.Text;
+
 import java.util.List;
 
 public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.ViewHolder> {
@@ -25,14 +29,26 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.ViewHold
     private OnDataChangedListener dataChangedListener;
     private OnItemClickListener itemClickListener;
     private String query = "";
+    LinearLayout confirmRoot;
+    TextView cardConfirm, cardName, cardBank, CardAccount;
+    ImageView Cardbankimage;
+
 
     private static final long ROTATE_DURATION = 10000; // v2 rotates for 10 seconds
     private static final long FXN_DURATION = 3000;     // helper function "runs" for 3 seconds
 
-    public AccountAdapter(List<Contact> contactList, int viewId1, int viewId2) {
+    public AccountAdapter(List<Contact> contactList, int viewId1, int viewId2, LinearLayout confirmRoot, TextView cardConfirm,
+                          TextView cardName,TextView cardBank,TextView CardAccount,ImageView Cardbankimage) {
         this.contactList = contactList;
         this.viewId1 = viewId1;
         this.viewId2 = viewId2;
+        this.confirmRoot = confirmRoot;
+        this. cardConfirm = cardConfirm;
+        this.cardName = cardName;
+        this.cardBank = cardBank;
+        this.CardAccount = CardAccount;
+        this.Cardbankimage = Cardbankimage;
+
     }
 
     public interface OnDataChangedListener {
@@ -116,21 +132,60 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.ViewHold
         holder.image.setImageResource(contact.getImageId());
 
         holder.itemView.setOnClickListener(v -> {
-            View loaderView = v.getRootView().findViewById(viewId1);
-            View progressBarView = v.getRootView().findViewById(viewId2);
+            if(confirmRoot == null){
+                View loaderView = v.getRootView().findViewById(viewId1);
+                View progressBarView = v.getRootView().findViewById(viewId2);
 
-            LoaderHelper.startLoaderRotation(loaderView, progressBarView, () -> {
-                AccountInfo.getInstance().setActivebank(R.mipmap.bank_opay);
-                AccountInfo.getInstance().setUserAccount(name);
-                AccountInfo.getInstance().setUserNumber(phone);
-                AccountInfo.getInstance().setUserBank("Opay");
-                AccountInfo.getInstance().setRootAccount("ODOEGBULAM THANKGOD CHIGOZIE");
-                AccountInfo.getInstance().setRootNumber("8165713623");
-                AccountInfo.getInstance().setRootBank("OPay");
+                LoaderHelper.startLoaderRotation(loaderView, progressBarView, () -> {
+                    AccountInfo.getInstance().setActivebank(R.mipmap.bank_opay);
+                    AccountInfo.getInstance().setUserAccount(name);
+                    AccountInfo.getInstance().setUserNumber(phone);
+                    AccountInfo.getInstance().setUserBank("Opay");
+                    AccountInfo.getInstance().setRootAccount("ODOEGBULAM THANKGOD CHIGOZIE");
+                    AccountInfo.getInstance().setRootNumber("8165713623");
+                    AccountInfo.getInstance().setRootBank("OPay");
 
-                Intent intent = new Intent(v.getContext(), straighttodeposit.class);
-                v.getContext().startActivity(intent);
-            });
+                    Intent intent = new Intent(v.getContext(), straighttodeposit.class);
+                    v.getContext().startActivity(intent);
+                });
+            }
+            else{
+                confirmRoot.setVisibility(View.VISIBLE);
+                cardName.setText(AccountInfo.getInstance().getUserAccount());
+                cardBank.setText(AccountInfo.getInstance().getUserBank());
+                String number = AccountInfo.getInstance().getUserNumber();
+                if (number != null && number.length() == 10) {
+                    String formated = number.substring(0, 3) + " " +
+                            number.substring(3, 6) + " " +
+                            number.substring(6);
+                    CardAccount.setText(formated);
+                } else {
+                    CardAccount.setText(number);
+                }
+                Cardbankimage.setImageResource(R.mipmap.bank_opay);
+                confirmRoot.setVisibility(View.VISIBLE);
+
+                cardConfirm.setOnClickListener(v1 -> {
+                    confirmRoot.setVisibility(View.GONE);
+
+                    View loaderView = v.getRootView().findViewById(viewId1);
+                    View progressBarView = v.getRootView().findViewById(viewId2);
+
+                    LoaderHelper.startLoaderRotation(loaderView, progressBarView, () -> {
+                        AccountInfo.getInstance().setActivebank(R.mipmap.bank_opay);
+                        AccountInfo.getInstance().setUserAccount(name);
+                        AccountInfo.getInstance().setUserNumber(phone);
+                        AccountInfo.getInstance().setUserBank("Opay");
+                        AccountInfo.getInstance().setRootAccount("ODOEGBULAM THANKGOD CHIGOZIE");
+                        AccountInfo.getInstance().setRootNumber("8165713623");
+                        AccountInfo.getInstance().setRootBank("OPay");
+
+                        Intent intent = new Intent(v.getContext(), straighttodeposit.class);
+                        v.getContext().startActivity(intent);
+                    });
+                });
+            }
+
         });
     }
 

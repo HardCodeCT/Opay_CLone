@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.view.animation.RotateAnimation;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -17,10 +19,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.pay.opay.AccountInfo.AccountInfo;
 import com.pay.opay.BankData;
+import com.pay.opay.ImageSwitcher.ImageSwitcherUtil;
 import com.pay.opay.R;
 import com.pay.opay.ResolveAccountName;
 import com.pay.opay.TextWatchers.OPayTextWatcherHelper;
@@ -37,7 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class deposit extends AppCompatActivity {
-    private ImageView iv_back;
+    private ImageView iv_back, Cardbankimage;
     private ContactViewModel contactViewModel;
     private TabLayout tabLayout;
     private ViewPager2 viewPager;
@@ -61,6 +65,10 @@ public class deposit extends AppCompatActivity {
     ResolveAccountName retrieveAccountName;
     RecyclerHeightAdjuster adjuster;
     OPayResponseChecker checker;
+    ShapeableImageView imageView;
+    private ImageSwitcherUtil imageSwitcher;
+    LinearLayout confirmRoot;
+    TextView cardConfirm, cardName, cardBank, CardAccount;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +79,18 @@ public class deposit extends AppCompatActivity {
         bankData.setBankCode(OPAY_BANK_CODE);
 
         setupViews();
+
+        imageSwitcher = new ImageSwitcherUtil(
+                imageView,
+                6000,
+                R.drawable.opay,
+                R.drawable.bang,
+                R.drawable.xbet,
+                R.drawable.ilotadvert
+        );
+
+        imageSwitcher.startSwitching();
+
         OPayTextWatcherHelper.setupAccountTextWatcher(
                 this,
                 opayaccount,
@@ -90,7 +110,8 @@ public class deposit extends AppCompatActivity {
 
         setupTouchInterceptor();
 
-        tabAdapter = new TabAdapter(this, R.id.loader, R.id.progress_bar);
+        tabAdapter = new TabAdapter(this, R.id.loader, R.id.progress_bar, R.id.confirmroot, R.id.cardConfirm, R.id.cardName,
+                R.id.cardBank, R.id.CardAccount, R.id.Cardbankimage);
         viewPager.setAdapter(tabAdapter);
         viewPager.setOffscreenPageLimit(2);
 
@@ -136,12 +157,22 @@ public class deposit extends AppCompatActivity {
         reload = findViewById(R.id.end_icon);
         loader = findViewById(R.id.loader);
         rotatingFrame = findViewById(R.id.progress_bar);
+        imageView = findViewById(R.id.switchableImageView);
+        confirmRoot = findViewById(R.id.confirmroot);
+        cardConfirm = findViewById(R.id.cardConfirm);
+        cardName = findViewById(R.id.cardName);
+        cardBank = findViewById(R.id.cardBank);
+        CardAccount = findViewById(R.id.CardAccount);
+        Cardbankimage = findViewById(R.id.Cardbankimage);
+
+
 
         accountRecycler = findViewById(R.id.accountRecycler);
         accountRecycler.setLayoutManager(new LinearLayoutManager(this));
         accountRecycler.setHasFixedSize(true);
         accountList = new ArrayList<>();
-        accountAdapter = new AccountAdapter(accountList, R.id.loader, R.id.progress_bar);
+        accountAdapter = new AccountAdapter(accountList, R.id.loader, R.id.progress_bar, confirmRoot, cardConfirm, cardName,
+                cardBank, CardAccount, Cardbankimage);
         accountRecycler.setAdapter(accountAdapter);
         adjuster = new RecyclerHeightAdjuster(this, accountRecycler, accountAdapter);
         adjuster.setupDynamicHeight();

@@ -72,8 +72,5 @@ public class BankRecentFragment extends Fragment {
         });
 
         LinearLayout btnViewAll = view.findViewById(R.id.btnViewAll);
-        btnViewAll.setOnClickListener(v ->
-                Toast.makeText(getContext(), "View All clicked", Toast.LENGTH_SHORT).show()
-        );
     }
 }

@@ -9,6 +9,8 @@ import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.pay.opay.AccountInfo.AccountInfo;
@@ -36,7 +38,6 @@ public class BankContactAdapter extends RecyclerView.Adapter<BankContactAdapter.
     public static class ContactViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvPhone, tvBankname;
         ImageView imageView;
-
         public ContactViewHolder(View itemView) {
             super(itemView);
             tvName = itemView.findViewById(R.id.tvName);
@@ -64,6 +65,8 @@ public class BankContactAdapter extends RecyclerView.Adapter<BankContactAdapter.
         holder.imageView.setImageResource(c.getImageName());
 
         holder.itemView.setOnClickListener(v -> {
+            AccountInfo.getInstance().setAlreadyset("set");
+
             View loaderView = v.getRootView().findViewById(loaderId);
             View progressBarView = v.getRootView().findViewById(progressBarId);
 

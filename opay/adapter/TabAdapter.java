@@ -12,23 +12,51 @@ public class TabAdapter extends FragmentStateAdapter {
 
     private final int loaderId;
     private final int progressBarId;
+    private final int confirmRootId;
+    private final int cardConfirmId;
+    private final int cardNameId;
+    private final int cardBankId;
+    private final int cardAccountId;
+    private final int cardBankImageId;
 
-    public TabAdapter(@NonNull FragmentActivity fragmentActivity, int loaderId, int progressBarId) {
+    public TabAdapter(
+            @NonNull FragmentActivity fragmentActivity,
+            int loaderId,
+            int progressBarId,
+            int confirmRootId,
+            int cardConfirmId,
+            int cardNameId,
+            int cardBankId,
+            int cardAccountId,
+            int cardBankImageId
+    ) {
         super(fragmentActivity);
         this.loaderId = loaderId;
         this.progressBarId = progressBarId;
+        this.confirmRootId = confirmRootId;
+        this.cardConfirmId = cardConfirmId;
+        this.cardNameId = cardNameId;
+        this.cardBankId = cardBankId;
+        this.cardAccountId = cardAccountId;
+        this.cardBankImageId = cardBankImageId;
     }
 
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        switch (position) {
-            case 0:
-                return RecentsFragment.newInstance(loaderId, progressBarId);
-            case 1:
-                return new FavouritesFragment(); // if needed
-            default:
-                return RecentsFragment.newInstance(loaderId, progressBarId);
+        if (position == 0) {
+            return RecentsFragment.newInstance(
+                    loaderId,
+                    progressBarId,
+                    confirmRootId,
+                    cardConfirmId,
+                    cardNameId,
+                    cardBankId,
+                    cardAccountId,
+                    cardBankImageId
+            );
+        } else { // position == 1
+            return new FavouritesFragment();
         }
     }
 
@@ -37,3 +65,4 @@ public class TabAdapter extends FragmentStateAdapter {
         return 2;
     }
 }
+
