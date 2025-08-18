@@ -1,8 +1,12 @@
 package com.pay.opay.fragments;
 
 import android.annotation.SuppressLint;
+
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+
 import android.app.Application;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -157,13 +161,23 @@ public class HomeFragment extends Fragment {
     @SuppressLint("SetTextI18n")
     private void showBalance() {
         latesttransaction.setVisibility(View.VISIBLE);
-        displayAmount = AmountUtils.getFormattedAmount(this);
         Typeface robotoMedium = ResourcesCompat.getFont(requireContext(), R.font.robotomedium);
         balance.setTypeface(robotoMedium);
         balance.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
-        balance.setText("₦" + displayAmount);
         vieww.setImageResource(R.drawable.ic_account_show_balance_gray);
         latesttransaction.setVisibility(View.VISIBLE);
+
+        // Get ViewModel
+        AmountViewModel viewModel = new ViewModelProvider(this).get(AmountViewModel.class);
+
+        // Observe LiveData
+        viewModel.getAmountValue().observe(requireActivity(), amount -> {
+            String displayAmount = amount != null
+                    ? NumberFormat.getNumberInstance(Locale.US).format(amount)
+                    : "0";
+            balance.setText("₦" + displayAmount);
+            Toast.makeText(requireContext(), displayAmount, Toast.LENGTH_SHORT).show();
+        });
     }
     private void hideBalance() {
         latesttransaction.setVisibility(View.GONE);

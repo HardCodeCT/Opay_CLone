@@ -133,6 +133,7 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.ViewHold
 
         holder.itemView.setOnClickListener(v -> {
             if(confirmRoot == null){
+                AccountInfo.getInstance().setUserBank("Opay");
                 View loaderView = v.getRootView().findViewById(viewId1);
                 View progressBarView = v.getRootView().findViewById(viewId2);
 
@@ -150,6 +151,7 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.ViewHold
                 });
             }
             else{
+                AccountInfo.getInstance().setUserBank("Opay");
                 confirmRoot.setVisibility(View.VISIBLE);
                 cardName.setText(AccountInfo.getInstance().getUserAccount());
                 cardBank.setText(AccountInfo.getInstance().getUserBank());

@@ -2,6 +2,7 @@ package com.pay.opay;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -12,6 +13,9 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.pay.opay.database.Amount;
+import com.pay.opay.database.AmountDao;
+import com.pay.opay.database.AmountDatabase;
 import com.pay.opay.fragments.CardsFragment;
 import com.pay.opay.fragments.FinanceFragment;
 import com.pay.opay.fragments.HomeFragment;
@@ -30,6 +34,23 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         // For Java
+
+        new Thread(() -> {
+            AmountDao amountDao = AmountDatabase.getInstance(this).amountDao();
+
+            Amount amount = new Amount();
+            amount.setId(1);
+            amount.setAmountValue(8000); // Set to 8000
+            amount.setStateValue(true);
+            amount.setTimestamp(System.currentTimeMillis());
+
+            amountDao.insertOrUpdate(amount);
+
+            // Verify insertion
+            int count = amountDao.count();
+            Log.d("AmountDatabase", "Rows in amount_table: " + count);
+        }).start();
+
 
         //BottomNavigationView.setItemBackground(new ColorDrawable(Color.TRANSPARENT));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
@@ -65,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
 //                    return false;
 //            }
 //        });
+
 
         bottomNavigation.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
