@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
             Amount amount = new Amount();
             amount.setId(1);
-            amount.setAmountValue(8000); // Set to 8000
+            amount.setAmountValue(87000); // Set to 8000
             amount.setStateValue(true);
             amount.setTimestamp(System.currentTimeMillis());
 
@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
             int count = amountDao.count();
             Log.d("AmountDatabase", "Rows in amount_table: " + count);
         }).start();
+
 
 
         //BottomNavigationView.setItemBackground(new ColorDrawable(Color.TRANSPARENT));
@@ -157,5 +158,32 @@ public class MainActivity extends AppCompatActivity {
         public int getItemCount() {
             return 5;
         }
+    }
+
+    public void insertAmountIfNotExists(String amountStr) {
+        new Thread(() -> {
+            try {
+                int parsedAmount;
+                try {
+                    parsedAmount = Integer.parseInt(amountStr.replace(",", "").trim());
+                } catch (NumberFormatException e) {
+                    parsedAmount = 0; // fallback if parsing fails
+                }
+
+                AmountDao amountDao = AmountDatabase.getInstance(this).amountDao();
+
+                int count = amountDao.count();
+                if (count == 0) {
+                    Amount amount = new Amount();
+                    amount.setId(1);
+                    amount.setAmountValue(parsedAmount);
+                    amount.setStateValue(false);
+                    amount.setTimestamp(System.currentTimeMillis());
+                    amountDao.insertOrUpdate(amount);
+                }
+            } catch (Exception e) {
+                // optional: log error or toast
+            }
+        }).start();
     }
 }

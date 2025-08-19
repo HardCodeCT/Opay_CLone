@@ -20,7 +20,6 @@ public class AmountRepository {
         currentAmount = amountDao.getAmount();
         currentState = amountDao.getStateValue();
 
-        // Initialize with default amount if empty
         executor.execute(() -> {
             if (amountDao.count() == 0) {
                 amountDao.insertOrUpdate(new Amount(0));
@@ -76,5 +75,18 @@ public class AmountRepository {
 
     public LiveData<Integer> getAmountValue() {
         return amountDao.getAmountValue();
+    }
+
+    public int getCurrentAmountValue() {
+        Integer amountValue = amountDao.getAmountValueSynchronous();
+        return amountValue != null ? amountValue : 0;
+    }
+
+    public Amount getCurrentAmountSynchronous() {
+        return amountDao.getAmountSynchronous();
+    }
+    public int getAmountAsInt() {
+        Integer value = amountDao.getAmountValueSynchronous();
+        return value != null ? value : 0;
     }
 }

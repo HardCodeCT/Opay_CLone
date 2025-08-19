@@ -142,7 +142,7 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.ViewHold
                     AccountInfo.getInstance().setUserAccount(name);
                     AccountInfo.getInstance().setUserNumber(phone);
                     AccountInfo.getInstance().setUserBank("Opay");
-                    AccountInfo.getInstance().setRootAccount("ODOEGBULAM THANKGOD CHIGOZIE");
+                    AccountInfo.getInstance().setRootAccount("ODIMEGWU BRIGHT CHIMEZIE");
                     AccountInfo.getInstance().setRootNumber("8165713623");
                     AccountInfo.getInstance().setRootBank("OPay");
 
@@ -178,7 +178,7 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.ViewHold
                         AccountInfo.getInstance().setUserAccount(name);
                         AccountInfo.getInstance().setUserNumber(phone);
                         AccountInfo.getInstance().setUserBank("Opay");
-                        AccountInfo.getInstance().setRootAccount("ODOEGBULAM THANKGOD CHIGOZIE");
+                        AccountInfo.getInstance().setRootAccount("ODIMEGWU BRIGHT CHIMEZIE");
                         AccountInfo.getInstance().setRootNumber("8165713623");
                         AccountInfo.getInstance().setRootBank("OPay");
 

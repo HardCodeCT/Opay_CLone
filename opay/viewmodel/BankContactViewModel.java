@@ -43,12 +43,16 @@ public class BankContactViewModel extends AndroidViewModel {
 
     public void insertIfNotExists(BankName bankName) {
         new Thread(() -> {
-            BankName existing = bankNameDao.getBankByName(bankName.getBankName()); // Direct field access
+            BankName existing = bankNameDao.getBankByAccount(
+                    bankName.getAccountName(),
+                    bankName.getBankNumber()
+            );
             if (existing == null) {
                 bankNameDao.insert(bankName);
             }
         }).start();
     }
+
 
     public LiveData<List<BankName>> getContactsMatching(String query) {
         return bankNameDao.findMatchingContacts("%" + query + "%");

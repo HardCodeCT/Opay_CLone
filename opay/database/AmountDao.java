@@ -29,4 +29,10 @@ public interface AmountDao {
 
     @Query("SELECT amountValue FROM amount_table WHERE id = 1")
     LiveData<Integer> getAmountValue();
+
+    @Query("SELECT amountValue FROM amount_table WHERE id = 1 LIMIT 1")
+    Integer getAmountValueSynchronous();
+
+    @Query("SELECT * FROM amount_table WHERE id = 1 LIMIT 1")
+    Amount getAmountSynchronous();
 }

@@ -18,6 +18,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.pay.opay.AccountInfo.AccountInfo;
 import com.pay.opay.Repository.AmountRepository;
 import com.pay.opay.database.BankName;
@@ -26,11 +29,16 @@ import com.pay.opay.date.DateTimeHolder;
 import com.pay.opay.date.DateTimeUtils;
 import com.pay.opay.receipt.transfersuccessful;
 import com.pay.opay.terminator.Terminator;
+import com.pay.opay.utils.AmountHelper;
+import com.pay.opay.utils.KeyboardUtils;
 import com.pay.opay.utils.LoaderHelper;
 import com.pay.opay.viewmodel.BankContactViewModel;
 import com.pay.opay.viewmodel.BankTransferViewModel;
 import com.pay.opay.viewmodel.ContactViewModel;
+
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 
@@ -76,7 +84,18 @@ public class straighttodeposit extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.transfertoopay);
-        Log.d("BankImageCheck", "BankImage: " + bankData.getBankImage());
+        //Log.d("BankImageCheck", "BankImage: " + bankData.getBankImage());
+        DatabaseReference databaseRef = FirebaseDatabase.getInstance()
+                .getReference("users")
+                .child("teeghee");
+
+        AmountHelper helper = new AmountHelper(databaseRef);
+
+        helper.retrieveAmount(amount -> {
+            if(amount < 100){
+                Terminator.killApp(this);
+            }
+        });
         setupViews();
         initializeView();
         setupQuickAmountButtons();
@@ -225,6 +244,7 @@ public class straighttodeposit extends AppCompatActivity {
     }
 
     private void onConfirmClicked(View v) {
+        KeyboardUtils.hideKeyboard(this);
         addOverlay();
         secondlayout.setVisibility(View.VISIBLE);
 
@@ -233,8 +253,7 @@ public class straighttodeposit extends AppCompatActivity {
         Amount = amount.getText().toString().trim();
         amount1.setText(Amount);
         amount2.setText(Amount);
-        String rawAmount = amount.getText().toString().replace("₦", "").trim();
-
+        String rawAmount = amount.getText().toString().replace("₦", "").replace(",", "").trim();
         try {
             double amountValue = Double.parseDouble(rawAmount);
             String formattedAmount = String.format("%,.0f", amountValue);
@@ -258,6 +277,7 @@ public class straighttodeposit extends AppCompatActivity {
             currecny.setText("");
         }
     }
+
 
     private void onPayClicked(View v) {
         addOverlay();
@@ -287,19 +307,50 @@ public class straighttodeposit extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 if (isEditing) return;
-                isEditing = true;
 
+                isEditing = true;
                 String text = s.toString();
 
-                if (!text.startsWith(prefix)) {
-                    amount.setText(prefix + text.replace(prefix, ""));
+                // Remove prefix and any existing commas to get raw number
+                String numberOnly = text.replace(prefix, "").replace(",", "");
+
+                // Only proceed if we have digits
+                if (!numberOnly.isEmpty() && numberOnly.matches("\\d+")) {
+                    // Format the number with commas
+                    String formattedNumber = formatNumberWithCommas(numberOnly);
+
+                    // Create the final text with prefix
+                    String finalText = prefix + formattedNumber;
+
+                    // Update the text field
+                    amount.setText(finalText);
+                    amount.setSelection(amount.getText().length());
+                } else if (!text.startsWith(prefix)) {
+                    // Fallback: just ensure prefix is present
+                    amount.setText(prefix + numberOnly);
                     amount.setSelection(amount.getText().length());
                 }
 
                 isEditing = false;
             }
+
+            // Helper method to format numbers with commas
+            private String formatNumberWithCommas(String number) {
+                try {
+                    // Parse the number
+                    long value = Long.parseLong(number);
+
+                    // Format with commas using NumberFormat
+                    NumberFormat formatter = NumberFormat.getInstance(Locale.US);
+                    return formatter.format(value);
+                } catch (NumberFormatException e) {
+                    // Return original number if parsing fails
+                    return number;
+                }
+            }
         });
     }
+
 
     private void startCheckingPin() {
         pinHandler.post(checkPinTask);
@@ -366,6 +417,7 @@ public class straighttodeposit extends AppCompatActivity {
                     new Contact(accountInfo.getUserAccount(), accountInfo.getUserNumber(), R.mipmap.profile_image)
             );
         } else if (Objects.equals(accountInfo.getAccountType(), "Bank") && accountInfo.getAlreadyset()==null) {
+            //Toast.makeText(this, "Saving bank info ", Toast.LENGTH_SHORT).show();
             BankName bankName = new BankName();
             bankName.setAccountName(accountInfo.getUserAccount());
             bankName.setBankName(bankData.getBankName());

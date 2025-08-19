@@ -6,7 +6,6 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-
 import android.app.Application;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -22,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -43,6 +43,14 @@ import com.pay.opay.BankOpay.transfertobank;
 import com.pay.opay.viewmodel.AmountViewModel;
 import com.pay.opay.viewmodel.BankTransferViewModel;
 import com.pay.opay.viewmodel.ContactViewModel;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 
 public class HomeFragment extends Fragment {
     private static final String ARG_TEXT = "text";
@@ -60,6 +68,13 @@ public class HomeFragment extends Fragment {
     private int currentTransaction2Id = -1;
     private int latestDisplayedId = -1; // Track the id of the latest displayed transfer
     private AccountInfo accountInfo;
+
+    // Define the missing variables
+    private String username;
+    private String numberHolder; // String to hold the retrieved number
+    private int firstcall = 0;
+
+    DatabaseReference databaseRef;
 
     public static HomeFragment newInstance(String text) {
         HomeFragment fragment = new HomeFragment();
@@ -81,6 +96,10 @@ public class HomeFragment extends Fragment {
             accountInfo = AccountInfo.getInstance();
             //Toast.makeText(getContext(), "Initializing application...", Toast.LENGTH_SHORT).show();
         }
+
+        // Initialize username and database reference
+        initializeUser();
+
         newuser(requireActivity().getApplication(), 150000);
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         setupViews(view);
@@ -89,8 +108,27 @@ public class HomeFragment extends Fragment {
         transactionlist();
         autoscroll();
         specialoffer();
+        showBalance();
         handler.post(pollForNewTransfers);
         return view;
+    }
+
+    private void initializeUser() {
+        // Get current Firebase user
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = auth.getCurrentUser();
+
+        if (currentUser != null) {
+            // Use Firebase user ID as username
+            username = currentUser.getUid();
+        } else {
+            // Fallback to a default username or handle authentication
+            username = "teeghee";
+        }
+
+        // Initialize database reference with username
+        databaseRef = FirebaseDatabase.getInstance()
+                .getReference("users").child(username);
     }
 
     @Override
@@ -168,32 +206,38 @@ public class HomeFragment extends Fragment {
         latesttransaction.setVisibility(View.VISIBLE);
 
         // Get ViewModel
-        AmountViewModel viewModel = new ViewModelProvider(this).get(AmountViewModel.class);
+        //AmountViewModel viewModel = new ViewModelProvider(this).get(AmountViewModel.class);
 
         // Observe LiveData
-        viewModel.getAmountValue().observe(requireActivity(), amount -> {
-            String displayAmount = amount != null
-                    ? NumberFormat.getNumberInstance(Locale.US).format(amount)
-                    : "0";
-            balance.setText("₦" + displayAmount);
-            Toast.makeText(requireContext(), displayAmount, Toast.LENGTH_SHORT).show();
-        });
+        if(firstcall == 0){
+            retrievebalance();
+        }else {
+            balance.setText("₦" + numberHolder);
+        }
+
+        //balance.setText("₦" + numberHolder);
+        //Toast.makeText(requireContext(), displayAmount, Toast.LENGTH_SHORT).show();
     }
+
     private void hideBalance() {
         latesttransaction.setVisibility(View.GONE);
         balance.setText("****");
         vieww.setImageResource(R.drawable.ic_account_hide_balance_gray);
         latesttransaction.setVisibility(View.GONE);
     }
+
     private void navigateToDeposit() {
         startActivity(new Intent(getContext(), deposit.class));
     }
+
     private void transactionhistory() {
         startActivity(new Intent(getContext(), TransHistory.class));
     }
+
     private void navigateToTransfer() {
         startActivity(new Intent(getContext(), transfertobank.class));
     }
+
     private void initializeContacts() {
         contactViewModel = new ViewModelProvider(this).get(ContactViewModel.class);
         addSampleContacts();
@@ -272,6 +316,7 @@ public class HomeFragment extends Fragment {
         contactViewModel.insertIfNotExists(new Contact("IJEOMA MARY OKECHUKWU", "1766996750", R.mipmap.profile_image));
         contactViewModel.insertIfNotExists(new Contact("IJEOMA MARY OKECHUKWU", "9123310347", R.mipmap.profile_image));
     }
+
     public static void newuser(Application application, int newAmountValue) {
         AmountViewModel viewModel = new ViewModelProvider.AndroidViewModelFactory(application)
                 .create(AmountViewModel.class);
@@ -398,9 +443,41 @@ public class HomeFragment extends Fragment {
             public void run() {
                 int next = (viewPager.getCurrentItem() + 1) % cards.size();
                 viewPager.setCurrentItem(next, true);
-                andler.postDelayed(this, 8000); // every 3 sec
+                andler.postDelayed(this, 8000); // every 8 sec
             }
         };
         andler.postDelayed(autoScroll, 6000);
     }
+
+    private void retrievebalance(){
+        databaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            String amountStr = snapshot.getValue(String.class);
+
+                            if (amountStr != null) {
+                                try {
+                                    long amount = Long.parseLong(amountStr); // convert string → number
+                                    String formatted = NumberFormat.getNumberInstance(Locale.US).format(amount);
+                                    balance.setText("₦" + formatted + ".00");
+                                    numberHolder = formatted;
+                                    firstcall++;
+
+                                } catch (NumberFormatException e) {
+                                    balance.setText("₦0");
+                                }
+                            } else {
+                                balance.setText("₦0");
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        balance.setText("₦0");
+                    }
+                });
+    }
+
 }

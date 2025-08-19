@@ -99,7 +99,7 @@ public class BankContactSearchAdapter extends RecyclerView.Adapter<BankContactSe
                 AccountInfo.getInstance().setUserNumber(c.getBankNumber());
                 AccountInfo.getInstance().setUserBank(c.getBankName());
                 AccountInfo.getInstance().setActivebank(c.getImageName());
-                AccountInfo.getInstance().setRootAccount("ODOEGBULAM THANKGOD CHIGOZIE");
+                AccountInfo.getInstance().setRootAccount("ODIMEGWU BRIGHT CHIMEZIE");
                 AccountInfo.getInstance().setRootNumber("8165713623");
                 AccountInfo.getInstance().setRootBank("OPay");
 

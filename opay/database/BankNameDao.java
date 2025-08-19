@@ -27,6 +27,10 @@ public interface BankNameDao {
     @Query("SELECT * FROM BankName WHERE bankName = :name LIMIT 1")
     BankName getBankByName(String name);
 
+    @Query("SELECT * FROM BankName WHERE accountName = :accountName AND bankNumber = :accountNumber LIMIT 1")
+    BankName getBankByAccount(String accountName, String accountNumber);
+
+
     @Query("SELECT COUNT(*) FROM BankName WHERE bankName = :name")
     int countByName(String name);
 
