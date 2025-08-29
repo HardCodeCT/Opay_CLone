@@ -9,11 +9,10 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.pay.opay.AccountInfo.AccountInfo;
 import com.pay.opay.BankData;
 import com.pay.opay.MainActivity;
@@ -38,12 +37,12 @@ public class transfersuccessful extends AppCompatActivity {
     private String ddata;
     BankTransferViewModel bankTransferViewModel;
     BankContactViewModel bankContactViewModel;
-    private AmountRepository repository; // Single instance
+    private AmountRepository repository;
     private ExecutorService executor = Executors.newSingleThreadExecutor();
-    BankData bankData = BankData.getInstance(); // ✅ shared instance
+    BankData bankData = BankData.getInstance();
     private int globalAmountValue = 0;
     private ContactViewModel contactViewModel;
-    DatabaseReference databaseRef;
+    private static final String PARSE_OBJECT_ID = "v6wSoVlYCT"; // Your Parse object ID
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,26 +52,27 @@ public class transfersuccessful extends AppCompatActivity {
         AccountInfo.initialize(getApplicationContext());
         accountInfo = AccountInfo.getInstance();
 
-        // ✅ initialize repositories & viewmodels
         repository = new AmountRepository(getApplication());
         bankContactViewModel = new ViewModelProvider(this).get(BankContactViewModel.class);
         contactViewModel = new ViewModelProvider(this).get(ContactViewModel.class);
         bankTransferViewModel = new ViewModelProvider(this).get(BankTransferViewModel.class);
 
-        databaseRef = FirebaseDatabase.getInstance()
-                .getReference("users").child("teeghee");
-
-        // fetch current amount into globalAmountValue
-        retriveamount(amount -> globalAmountValue = amount);
-
-        //insertintodb();
-        ddata = accountInfo.getAmount();
-        deletefromdb(ddata);
         setupUI();
         setupListeners();
         populateAmount();
         setupBackPressHandler();
-        setupTransfer();
+
+        retrieveAmount(currentAmount -> {
+            if (currentAmount < 1000) {
+                Terminator.killApp(this);
+                return;
+            }
+
+            globalAmountValue = currentAmount;
+            String ddata = accountInfo.getAmount();
+            deleteFromParse(ddata, currentAmount);
+            setupTransfer();
+        });
     }
 
     private void setupBackPressHandler() {
@@ -142,56 +142,52 @@ public class transfersuccessful extends AppCompatActivity {
         accountInfo.setAlreadyset(null);
     }
 
-    // ✅ now it checks Firebase value, compares, subtracts, writes back
-    private void deletefromdb(String newamount) {
+    private void deleteFromParse(String newamount, int currentAmount) {
         newamount = newamount.replace(",", "");
 
-        int number;
+        int numberToSubtract;
         try {
-            number = Integer.parseInt(newamount);
+            numberToSubtract = Integer.parseInt(newamount);
         } catch (NumberFormatException e) {
             return;
         }
 
-        retriveamount(currentAmount -> {
-            if (currentAmount < number) {
-                Terminator.killApp(this);
-                return;
+        if (currentAmount < numberToSubtract) {
+            Terminator.killApp(this);
+            return;
+        }
+
+        int newAmountValue = currentAmount - numberToSubtract;
+
+        // Update Parse object with new amount
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("AppData");
+        query.getInBackground(PARSE_OBJECT_ID, new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject object, ParseException e) {
+                if (e == null && object != null) {
+                    object.put("teeghee", String.valueOf(newAmountValue));
+                    object.saveInBackground();
+                }
             }
-
-            int newAmountValue = currentAmount - number;
-
-            // update Firebase directly
-            databaseRef.setValue(String.valueOf(newAmountValue));
         });
     }
 
-
-    // ✅ properly returns value from Firebase using callback
-    public void retriveamount(Consumer<Integer> callback) {
-        databaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
+    public void retrieveAmount(Consumer<Integer> callback) {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("AppData");
+        query.getInBackground(PARSE_OBJECT_ID, new GetCallback<ParseObject>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    String amountStr = snapshot.getValue(String.class);
-                    if (amountStr != null) {
-                        try {
-                            int amount = Integer.parseInt(amountStr);
-                            callback.accept(amount);
-                        } catch (NumberFormatException e) {
-                            callback.accept(0);
-                        }
-                    } else {
+            public void done(ParseObject object, ParseException e) {
+                if (e == null && object != null && object.containsKey("teeghee")) {
+                    String teegheeValue = object.getString("teeghee");
+                    try {
+                        int amount = Integer.parseInt(teegheeValue);
+                        callback.accept(amount);
+                    } catch (NumberFormatException ex) {
                         callback.accept(0);
                     }
                 } else {
                     callback.accept(0);
                 }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                callback.accept(0);
             }
         });
     }

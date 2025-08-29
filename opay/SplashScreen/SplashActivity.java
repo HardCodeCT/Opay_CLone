@@ -7,10 +7,12 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.parse.Parse;
 import com.pay.opay.AccountInfo.AccountInfo;
 import com.pay.opay.MainActivity;
 import com.pay.opay.R;
@@ -19,6 +21,8 @@ public class SplashActivity extends AppCompatActivity {
 
     private static final String TAG = "SplashActivity";
     private RelativeLayout splashLayout;
+    private boolean parseInitialized = false;
+    private boolean firebaseInitialized = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,29 +31,50 @@ public class SplashActivity extends AppCompatActivity {
 
         splashLayout = findViewById(R.id.splashScreen);
 
-        // Initialize Firebase first
+        // Initialize components in parallel
         initializeFirebase();
-
-        // Initialize other components
+        initializeParse();
         AccountInfo.initialize(this);
-        clearAllAppDatabases();
+        //clearAllAppDatabases();
 
-        startSplashSequence();
+        // Start checking if both services are initialized
+        startInitializationCheck();
     }
 
     private void initializeFirebase() {
-        try {
-            // Check if already initialized
-            if (FirebaseApp.getApps(this).isEmpty()) {
-                FirebaseApp.initializeApp(this);
+        new Thread(() -> {
+            try {
+                if (FirebaseApp.getApps(this).isEmpty()) {
+                    FirebaseApp.initializeApp(this);
+                }
+                FirebaseAuth.getInstance();
+                firebaseInitialized = true;
+                Log.d(TAG, "Firebase initialized successfully");
+            } catch (Exception e) {
+                Log.e(TAG, "Firebase initialization failed", e);
+                runOnUiThread(() ->
+                        Toast.makeText(this, "Firebase init failed", Toast.LENGTH_SHORT).show());
             }
-            // Verify initialization by getting auth instance
-            FirebaseAuth.getInstance();
-            Log.d(TAG, "Firebase initialized successfully");
-        } catch (Exception e) {
-            Log.e(TAG, "Firebase initialization failed", e);
-            // Handle error or retry
-        }
+        }).start();
+    }
+
+    private void initializeParse() {
+        new Thread(() -> {
+            try {
+                Parse.initialize(new Parse.Configuration.Builder(this)
+                        .applicationId("gZDdAxygNAE4mvsfpGyhHUbP7Sp0MNQWHWb3ylcr")
+                         .clientKey("sqYIwNoWxk0MGhpqx8HEoFbllOpzDJ5bOVY5Nb2q")
+                        .server("https://parseapi.back4app.com/")
+                        .build()
+                );
+                parseInitialized = true;
+                Log.d(TAG, "Parse initialized successfully");
+            } catch (Exception e) {
+                Log.e(TAG, "Parse initialization failed", e);
+                runOnUiThread(() ->
+                        Toast.makeText(this, "Parse init failed", Toast.LENGTH_SHORT).show());
+            }
+        }).start();
     }
 
     private void clearAllAppDatabases() {
@@ -57,6 +82,23 @@ public class SplashActivity extends AppCompatActivity {
         deleteDatabase("bank_name_database.db");
         deleteDatabase("bank_transfer_database.db");
         deleteDatabase("contact_database.db");
+    }
+
+    private void startInitializationCheck() {
+        final Handler handler = new Handler(Looper.getMainLooper());
+        final Runnable checkRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (firebaseInitialized && parseInitialized) {
+                    // Both services initialized, proceed with splash sequence
+                    startSplashSequence();
+                } else {
+                    // Check again after 100ms
+                    handler.postDelayed(this, 100);
+                }
+            }
+        };
+        handler.post(checkRunnable);
     }
 
     private void startSplashSequence() {
@@ -69,4 +111,3 @@ public class SplashActivity extends AppCompatActivity {
         }, 3000);
     }
 }
-

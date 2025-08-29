@@ -63,7 +63,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
             AccountInfo.getInstance().setUserNumber(c.phone);
             AccountInfo.getInstance().setUserBank("Access Bank");
             AccountInfo.getInstance().setRootAccount("ODIMEGWU BRIGHT CHIMEZIE");
-            AccountInfo.getInstance().setRootNumber("8165713623");
+            AccountInfo.getInstance().setRootNumber("8173534279");
             AccountInfo.getInstance().setRootBank("OPay");
 
             Intent intent = new Intent(v.getContext(), straighttodeposit.class);

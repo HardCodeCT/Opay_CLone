@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.pay.opay.AccountInfo.AccountInfo;
 
+
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -19,7 +20,7 @@ import java.net.URLEncoder;
 public class BankResolver {
     private static final String TAG = "BankResolver";
     private static final String BASE_URL = "https://nubapi.com/api/verify";
-    private static final String BEARER_TOKEN = "FKJj8DDSmWTQCcS3RlTp5VYWPk8putFvPpL8rItxb45ddce2";
+    private static final String BEARER_TOKEN = "in976wwVy6dBhI65xPZDB7pkeApoc8hIg4mO9gQJ09b6d0cc";
 
     private final Handler backgroundHandler;
     private final Handler mainHandler;

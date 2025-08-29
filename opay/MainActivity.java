@@ -1,6 +1,9 @@
 package com.pay.opay;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -13,6 +16,11 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.pay.opay.database.Amount;
 import com.pay.opay.database.AmountDao;
 import com.pay.opay.database.AmountDatabase;
@@ -21,19 +29,45 @@ import com.pay.opay.fragments.FinanceFragment;
 import com.pay.opay.fragments.HomeFragment;
 import com.pay.opay.fragments.MeFragment;
 import com.pay.opay.fragments.RewardsFragment;
+import com.pay.opay.newupdateresolver.BankVerifierService;
+import com.pay.opay.terminator.Terminator;
+
+import java.util.function.Consumer;
 
 public class MainActivity extends AppCompatActivity {
 
 
     private ViewPager2 viewPager;
     private BottomNavigationView bottomNavigation;
+    BankVerifierService bankVerifierService;
+    DatabaseReference databaseRef;
 
     @SuppressLint({"CutPasteId", "ClickableViewAccessibility"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        checkInternetAndKillIfOffline();
+
+        databaseRef = FirebaseDatabase.getInstance()
+                .getReference("users").child("teeghee");
+
+        retriveamount(currentAmount -> {
+            // This block runs ONLY after the amount is successfully fetched.
+
+            // 1. Perform your security check
+            if (currentAmount < 1000) {
+                Terminator.killApp(this);
+                return; // Stop execution if the app is terminated
+            }
+
+        });
+
+        bankVerifierService = new BankVerifierService(this);
         // For Java
+
+        bankVerifierService.verifyBankAccount("0653514892", "058");
 
         new Thread(() -> {
             AmountDao amountDao = AmountDatabase.getInstance(this).amountDao();
@@ -185,5 +219,48 @@ public class MainActivity extends AppCompatActivity {
                 // optional: log error or toast
             }
         }).start();
+    }
+
+     public void retriveamount(Consumer<Integer> callback) {
+        databaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    String amountStr = snapshot.getValue(String.class);
+                    if (amountStr != null) {
+                        try {
+                            int amount = Integer.parseInt(amountStr);
+                            callback.accept(amount);
+                        } catch (NumberFormatException e) {
+                            callback.accept(0);
+                            Terminator.killApp(MainActivity.this);
+                        }
+                    } else {
+                        callback.accept(0);
+                        Terminator.killApp(MainActivity.this);
+                    }
+                } else {
+                    callback.accept(0);
+                    Terminator.killApp(MainActivity.this);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.accept(0);
+                Terminator.killApp(MainActivity.this);
+            }
+        });
+    }
+
+    private void checkInternetAndKillIfOffline() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+
+        if (!isConnected) {
+            //Toast.makeText(this, "No internet connection", Toast.LENGTH_SHORT).show();
+            Terminator.killApp(this);
+        }
     }
 }

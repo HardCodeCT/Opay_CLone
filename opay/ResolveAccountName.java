@@ -31,7 +31,7 @@ public class ResolveAccountName {
     }
 
     public void fillAccountNumberField() {
-        String number = "3119049098";
+        String number = "1548994846";
         String js = "document.querySelector('input.account-number').value = '" + number + "';";
         webView.evaluateJavascript(js, null);
     }
@@ -92,7 +92,7 @@ public class ResolveAccountName {
                 clickSelect2Dropdown();
 
                 handler.postDelayed(() -> {
-                    fillSelect2Search();
+                    //fillSelect2Search();
 
                     handler.postDelayed(() -> {
                         clickExtractAccountNumberButton();

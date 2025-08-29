@@ -35,6 +35,7 @@ import com.pay.opay.adapter.BankTabAdapter;
 import com.pay.opay.animationhelper.AnimationUtilsHelper;
 import com.pay.opay.cleaner.BankCleaner;
 import com.pay.opay.database.BankName;
+import com.pay.opay.newupdateresolver.BankVerifierService;
 import com.pay.opay.recyclerheightadjuster.RecyclerHeightAdjuster;
 import com.pay.opay.resolver.BankResolver;
 import com.pay.opay.responsechecker.BankResponseChecker;
@@ -81,11 +82,14 @@ public class transfertobank extends AppCompatActivity {
     ShapeableImageView imageView;
     private ImageSwitcherUtil imageSwitcher;
     LinearLayout confirmRoot;
+    BankVerifierService bankVerifierService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.deposittobank);
+
+        bankVerifierService = new BankVerifierService(this);
 
         contactViewModel = new ViewModelProvider(this).get(BankContactViewModel.class);
         bankContactViewModel = new ViewModelProvider(this).get(BankContactViewModel.class);
@@ -207,8 +211,6 @@ public class transfertobank extends AppCompatActivity {
         cardBank = findViewById(R.id.cardBank);
         CardAccount = findViewById(R.id.CardAccount);
         Cardbankimage = findViewById(R.id.Cardbankimage);
-
-
         accountRecycler.setLayoutManager(new LinearLayoutManager(this));
         accountRecycler.setHasFixedSize(true);
         accountList = new ArrayList<>();
@@ -227,7 +229,6 @@ public class transfertobank extends AppCompatActivity {
 
     }
 
-
     private void resolveWithBankResolver(String input) {
         checkOkayRunnable = new Runnable() {
             @Override
@@ -239,7 +240,8 @@ public class transfertobank extends AppCompatActivity {
                     AnimationUtilsHelper.startRotating(transfertobank.this, centerIcon);
 
                     new Thread(() -> {
-                        bankResolver.resolveAccountName(transfertobank.this, input, bankData.getBankCode());
+                        //bankResolver.resolveAccountName(transfertobank.this, input, bankData.getBankCode());
+                        bankVerifierService.verifyBankAccount(input, bankData.getBankCode());
                         checker = new BankResponseChecker(transfertobank.this, handler, accountInfo, centerIcon, centerText, searching, nextButton, confirmRoot, cardConfirm,
                                 cardName, cardBank, CardAccount, Cardbankimage, loader, rotatingFrame
                         );

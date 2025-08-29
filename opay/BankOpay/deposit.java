@@ -8,6 +8,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.RotateAnimation;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -32,6 +34,7 @@ import com.pay.opay.adapter.AccountAdapter;
 import com.pay.opay.adapter.TabAdapter;
 import com.pay.opay.animationhelper.AnimationUtilsHelper;
 import com.pay.opay.database.Contact;
+import com.pay.opay.newupdateresolver.BankVerifierService;
 import com.pay.opay.recyclerheightadjuster.RecyclerHeightAdjuster;
 import com.pay.opay.resolver.BankResolver;
 import com.pay.opay.responsechecker.OPayResponseChecker;
@@ -47,7 +50,7 @@ public class deposit extends AppCompatActivity {
     private ViewPager2 viewPager;
     private TabAdapter tabAdapter;
     private BankData bankData = BankData.getInstance();
-    private static final String OPAY_BANK_CODE = "100004";
+    private static final String OPAY_BANK_CODE = "999992";
     private AccountInfo accountInfo = AccountInfo.getInstance();
     private BankResolver bankResolver = new BankResolver();
     private ViewGroup searching, dont, flag, accountdet, recyclerparent;
@@ -69,10 +72,16 @@ public class deposit extends AppCompatActivity {
     private ImageSwitcherUtil imageSwitcher;
     LinearLayout confirmRoot;
     TextView cardConfirm, cardName, cardBank, CardAccount;
+    BankVerifierService bankVerifierService;
+
+    private WebView webView;
+    private ResolveAccountName resolver;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.depositopay);
+
+         bankVerifierService = new BankVerifierService(this);
 
         contactViewModel = new ViewModelProvider(this).get(ContactViewModel.class);
         bankData.setBankImage(R.mipmap.bank_opay);
@@ -165,8 +174,6 @@ public class deposit extends AppCompatActivity {
         CardAccount = findViewById(R.id.CardAccount);
         Cardbankimage = findViewById(R.id.Cardbankimage);
 
-
-
         accountRecycler = findViewById(R.id.accountRecycler);
         accountRecycler.setLayoutManager(new LinearLayoutManager(this));
         accountRecycler.setHasFixedSize(true);
@@ -186,7 +193,8 @@ public class deposit extends AppCompatActivity {
         AnimationUtilsHelper.startRotating(deposit.this,updateimage);
 
         new Thread(() -> {
-            bankResolver.resolveAccountName(deposit.this, input, OPAY_BANK_CODE);
+            //bankResolver.resolveAccountName(deposit.this, input, OPAY_BANK_CODE);
+            bankVerifierService.verifyBankAccount(input, OPAY_BANK_CODE);
             checker = new OPayResponseChecker(handler, accountInfo, accountAdapter);
             handler.post(() -> checker.check(searching, flag, recyclerparent, accountRecycler, updateimage));
 

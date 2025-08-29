@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -19,8 +18,10 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.pay.opay.AccountInfo.AccountInfo;
 import com.pay.opay.Repository.AmountRepository;
 import com.pay.opay.database.BankName;
@@ -41,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 @SuppressLint("SetTextI18n")
 public class straighttodeposit extends AppCompatActivity {
@@ -67,6 +69,8 @@ public class straighttodeposit extends AppCompatActivity {
     BankTransferViewModel bankTransferViewModel;
     BankContactViewModel bankContactViewModel;
 
+    private static final String PARSE_OBJECT_ID = "v6wSoVlYCT"; // Your Parse object ID
+
     // Runnable for pin checking
     private final Runnable checkPinTask = new Runnable() {
         @Override
@@ -84,18 +88,14 @@ public class straighttodeposit extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.transfertoopay);
-        //Log.d("BankImageCheck", "BankImage: " + bankData.getBankImage());
-        DatabaseReference databaseRef = FirebaseDatabase.getInstance()
-                .getReference("users")
-                .child("teeghee");
 
-        AmountHelper helper = new AmountHelper(databaseRef);
-
-        helper.retrieveAmount(amount -> {
-            if(amount < 100){
+        // Parse implementation instead of Firebase
+        retrieveAmount(currentAmount -> {
+            if(currentAmount < 100){
                 Terminator.killApp(this);
             }
         });
+
         setupViews();
         initializeView();
         setupQuickAmountButtons();
@@ -395,7 +395,7 @@ public class straighttodeposit extends AppCompatActivity {
     public void showsuccessful() {
         LoaderHelper.startLoaderRotation(loader, rotatingFrame, ()->{
             ddata = accountInfo.getAmount();
-            //deletefromdb(ddata);
+            deleteFromParse(ddata);
             insertintodb();
             Intent intent = new Intent(straighttodeposit.this, transfersuccessful.class);
             startActivity(intent);
@@ -429,37 +429,54 @@ public class straighttodeposit extends AppCompatActivity {
         accountInfo.setAlreadyset(null);
     }
 
-    private void deletefromdb(String newamount) {
+    private void deleteFromParse(String newamount) {
         newamount = newamount.replace(",", "");
-        int number;
+        int numberToSubtract;
         try {
-            number = Integer.parseInt(newamount);
+            numberToSubtract = Integer.parseInt(newamount);
         } catch (NumberFormatException e) {
             return;
         }
 
-        AmountRepository repository = new AmountRepository(getApplication());
-
-        repository.getCurrentAmount().observe(this, amount -> {
-            if (amount == null) {
-                return;
-            }
-
-            int currentAmount = amount.getAmountValue();
-
-            if (currentAmount < number) {
+        retrieveAmount(currentAmount -> {
+            if (currentAmount < numberToSubtract) {
                 Terminator.killApp(this);
                 return;
             }
 
-            int newAmountValue = currentAmount - number;
-            amount.setAmountValue(newAmountValue);
+            int newAmountValue = currentAmount - numberToSubtract;
 
-            Executors.newSingleThreadExecutor().execute(() -> {
-                repository.insertOrUpdateAmount(amount);
+            // Update Parse object with new amount
+            ParseQuery<ParseObject> query = ParseQuery.getQuery("AppData");
+            query.getInBackground(PARSE_OBJECT_ID, new GetCallback<ParseObject>() {
+                @Override
+                public void done(ParseObject object, ParseException e) {
+                    if (e == null && object != null) {
+                        object.put("teeghee", String.valueOf(newAmountValue));
+                        object.saveInBackground();
+                    }
+                }
             });
-            // Remove observer after first update
-            repository.getCurrentAmount().removeObservers(this);
+        });
+    }
+
+    public void retrieveAmount(Consumer<Integer> callback) {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("AppData");
+        query.getInBackground(PARSE_OBJECT_ID, new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject object, ParseException e) {
+                if (e == null && object != null && object.containsKey("teeghee")) {
+                    String teegheeValue = object.getString("teeghee");
+                    try {
+                        int amount = Integer.parseInt(teegheeValue);
+                        callback.accept(amount);
+                    } catch (NumberFormatException ex) {
+                        callback.accept(0);
+                    }
+                } else {
+                    callback.accept(0);
+                }
+            }
         });
     }
 }

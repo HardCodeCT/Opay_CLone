@@ -1,11 +1,6 @@
 package com.pay.opay.fragments;
 
 import android.annotation.SuppressLint;
-
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 import android.app.Application;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -21,36 +16,35 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.annotation.NonNull;
+
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
+
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.pay.opay.AccountInfo.AccountInfo;
-import com.pay.opay.terminator.Terminator;
-import com.pay.opay.utils.AmountUtils;
+import com.pay.opay.BankOpay.deposit;
+import com.pay.opay.BankOpay.transfertobank;
 import com.pay.opay.InviteCard;
 import com.pay.opay.InviteCardAdapter;
-import com.pay.opay.OfferCardAdapter;
 import com.pay.opay.Models.OfferModel;
+import com.pay.opay.OfferCardAdapter;
 import com.pay.opay.R;
 import com.pay.opay.TransHistory;
 import com.pay.opay.database.BankTransfer;
 import com.pay.opay.database.Contact;
-import com.pay.opay.BankOpay.deposit;
 import com.pay.opay.receipt.MainReceipt;
-import com.pay.opay.BankOpay.transfertobank;
+import com.pay.opay.terminator.Terminator;
 import com.pay.opay.viewmodel.AmountViewModel;
 import com.pay.opay.viewmodel.BankTransferViewModel;
 import com.pay.opay.viewmodel.ContactViewModel;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 public class HomeFragment extends Fragment {
     private static final String ARG_TEXT = "text";
@@ -66,15 +60,11 @@ public class HomeFragment extends Fragment {
     GridLayout gridLayout;
     private int currentTransaction1Id = -1;
     private int currentTransaction2Id = -1;
-    private int latestDisplayedId = -1; // Track the id of the latest displayed transfer
+    private int latestDisplayedId = -1;
     private AccountInfo accountInfo;
 
-    // Define the missing variables
-    private String username;
-    private String numberHolder; // String to hold the retrieved number
+    private String numberHolder;
     private int firstcall = 0;
-
-    DatabaseReference databaseRef;
 
     public static HomeFragment newInstance(String text) {
         HomeFragment fragment = new HomeFragment();
@@ -87,18 +77,16 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Initialize AccountInfo first
         try {
             accountInfo = AccountInfo.getInstance();
         } catch (IllegalStateException e) {
-            // Handle case where AccountInfo isn't initialized
             AccountInfo.initialize(requireContext().getApplicationContext());
             accountInfo = AccountInfo.getInstance();
-            //Toast.makeText(getContext(), "Initializing application...", Toast.LENGTH_SHORT).show();
         }
 
-        // Initialize username and database reference
-        initializeUser();
+        AccountInfo.getInstance().setRootAccount("ODIMEGWU BRIGHT CHIMEZIE");
+        AccountInfo.getInstance().setRootNumber("8173534279");
+        AccountInfo.getInstance().setRootBank("OPay");
 
         newuser(requireActivity().getApplication(), 150000);
         View view = inflater.inflate(R.layout.fragment_home, container, false);
@@ -111,24 +99,6 @@ public class HomeFragment extends Fragment {
         showBalance();
         handler.post(pollForNewTransfers);
         return view;
-    }
-
-    private void initializeUser() {
-        // Get current Firebase user
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        FirebaseUser currentUser = auth.getCurrentUser();
-
-        if (currentUser != null) {
-            // Use Firebase user ID as username
-            username = currentUser.getUid();
-        } else {
-            // Fallback to a default username or handle authentication
-            username = "teeghee";
-        }
-
-        // Initialize database reference with username
-        databaseRef = FirebaseDatabase.getInstance()
-                .getReference("users").child(username);
     }
 
     @Override
@@ -175,16 +145,9 @@ public class HomeFragment extends Fragment {
         for (int i = 0; i < gridLayout.getChildCount(); i++) {
             View child = gridLayout.getChildAt(i);
             if (child instanceof LinearLayout) {
-                child.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        // Perform your task here for any item clicked
-                        Terminator.killApp(requireActivity());
-                    }
-                });
+                child.setOnClickListener(v -> Terminator.killApp(requireActivity()));
             }
         }
-
     }
 
     private void toggleBalanceVisibility() {
@@ -205,18 +168,11 @@ public class HomeFragment extends Fragment {
         vieww.setImageResource(R.drawable.ic_account_show_balance_gray);
         latesttransaction.setVisibility(View.VISIBLE);
 
-        // Get ViewModel
-        //AmountViewModel viewModel = new ViewModelProvider(this).get(AmountViewModel.class);
-
-        // Observe LiveData
-        if(firstcall == 0){
+        if (firstcall == 0) {
             retrievebalance();
-        }else {
+        } else {
             balance.setText("₦" + numberHolder);
         }
-
-        //balance.setText("₦" + numberHolder);
-        //Toast.makeText(requireContext(), displayAmount, Toast.LENGTH_SHORT).show();
     }
 
     private void hideBalance() {
@@ -243,6 +199,7 @@ public class HomeFragment extends Fragment {
         addSampleContacts();
     }
 
+    @SuppressLint("SetTextI18n")
     public void transactionlist() {
         transaction1.setVisibility(View.GONE);
         transaction2.setVisibility(View.GONE);
@@ -253,56 +210,53 @@ public class HomeFragment extends Fragment {
         price1.setText("");
         price2.setText("");
         BankTransferViewModel viewModel = new ViewModelProvider(this).get(BankTransferViewModel.class);
-        viewModel.getAllTransfers().observe(getViewLifecycleOwner(), transfers -> {
-            requireActivity().runOnUiThread(() -> {
-                if (transfers == null || transfers.isEmpty()) {
-                    transaction1.setVisibility(View.GONE);
-                    transaction2.setVisibility(View.GONE);
-                    return;
+        viewModel.getAllTransfers().observe(getViewLifecycleOwner(), transfers -> requireActivity().runOnUiThread(() -> {
+            if (transfers == null || transfers.isEmpty()) {
+                transaction1.setVisibility(View.GONE);
+                transaction2.setVisibility(View.GONE);
+                return;
+            }
+            BankTransfer latest = null;
+            BankTransfer secondLatest = null;
+            int maxId = -1;
+            int secondMaxId = -1;
+            for (BankTransfer t : transfers) {
+                if (t.id > maxId) {
+                    secondMaxId = maxId;
+                    secondLatest = latest;
+                    maxId = t.id;
+                    latest = t;
+                } else if (t.id > secondMaxId) {
+                    secondMaxId = t.id;
+                    secondLatest = t;
                 }
-                // Find the transfers with the highest and second highest IDs
-                BankTransfer latest = null;
-                BankTransfer secondLatest = null;
-                int maxId = -1;
-                int secondMaxId = -1;
-                for (BankTransfer t : transfers) {
-                    if (t.id > maxId) {
-                        secondMaxId = maxId;
-                        secondLatest = latest;
-                        maxId = t.id;
-                        latest = t;
-                    } else if (t.id > secondMaxId) {
-                        secondMaxId = t.id;
-                        secondLatest = t;
+            }
+            if (latest != null) {
+                transaction1.setVisibility(View.VISIBLE);
+                user2.setText(latest.senderName);
+                datetime2.setText(latest.longdatetime);
+                price2.setText("₦" + latest.amount);
+                latestDisplayedId = latest.id;
+                currentTransaction2Id = latest.id;
+                transaction1.setOnClickListener(v -> {
+                    if (currentTransaction2Id != -1) {
+                        showTransactionDetails(currentTransaction2Id);
                     }
-                }
-                if (latest != null) {
-                    transaction1.setVisibility(View.VISIBLE);
-                    user2.setText(latest.senderName);
-                    datetime2.setText(latest.longdatetime);
-                    price2.setText("₦" + latest.amount);
-                    latestDisplayedId = latest.id; // Store the latest id
-                    currentTransaction2Id = latest.id; // Store the ID for transaction2
-                    transaction1.setOnClickListener(v -> {
-                        if (currentTransaction2Id != -1) {
-                            showTransactionDetails(currentTransaction2Id);
-                        }
-                    });
-                }
-                if (secondLatest != null) {
-                    transaction2.setVisibility(View.VISIBLE);
-                    user1.setText(secondLatest.senderName);
-                    datetime1.setText(secondLatest.longdatetime);
-                    price1.setText("₦" + secondLatest.amount);
-                    currentTransaction1Id = secondLatest.id; // Store the ID for transaction1
-                    transaction2.setOnClickListener(v -> {
-                        if (currentTransaction1Id != -1) {
-                            showTransactionDetails(currentTransaction1Id);
-                        }
-                    });
-                }
-            });
-        });
+                });
+            }
+            if (secondLatest != null) {
+                transaction2.setVisibility(View.VISIBLE);
+                user1.setText(secondLatest.senderName);
+                datetime1.setText(secondLatest.longdatetime);
+                price1.setText("₦" + secondLatest.amount);
+                currentTransaction1Id = secondLatest.id;
+                transaction2.setOnClickListener(v -> {
+                    if (currentTransaction1Id != -1) {
+                        showTransactionDetails(currentTransaction1Id);
+                    }
+                });
+            }
+        }));
     }
 
     private void addSampleContacts() {
@@ -334,16 +288,16 @@ public class HomeFragment extends Fragment {
                 .get(BankTransferViewModel.class);
 
         viewModel.checkForNewTransfer(new BankTransferViewModel.NewTransferCallback() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onNewTransfer(BankTransfer latest) {
                 if (latestDisplayedId == -1 || latest.id > latestDisplayedId) {
                     requireActivity().runOnUiThread(() -> {
-                        // Only move transaction1 to transaction2 if transaction1 was visible
                         if (transaction1.getVisibility() == View.VISIBLE) {
                             currentTransaction2Id = currentTransaction1Id;
-                            user1.setText(user2.getText()); // Copy user1 to user2
-                            datetime1.setText(datetime2.getText()); // Copy datetime1 to datetime2
-                            price1.setText(price2.getText()); // Copy price1 to price2
+                            user1.setText(user2.getText());
+                            datetime1.setText(datetime2.getText());
+                            price1.setText(price2.getText());
                             transaction2.setVisibility(View.VISIBLE);
                             transaction2.setOnClickListener(v -> {
                                 if (currentTransaction2Id != -1) {
@@ -352,25 +306,23 @@ public class HomeFragment extends Fragment {
                             });
                         }
 
-                        // Set new transfer to transaction1
                         currentTransaction1Id = latest.id;
-                        user2.setText(latest.senderName); // Update user1
-                        datetime2.setText(latest.longdatetime); // Update datetime1
-                        price2.setText("₦" + latest.amount); // Update price1
+                        user2.setText(latest.senderName);
+                        datetime2.setText(latest.longdatetime);
+                        price2.setText("₦" + latest.amount);
                         transaction1.setVisibility(View.VISIBLE);
                         transaction1.setOnClickListener(v -> {
                             if (currentTransaction1Id != -1) {
                                 showTransactionDetails(currentTransaction1Id);
                             }
                         });
-                        latestDisplayedId = latest.id; // Update the latest displayed id
+                        latestDisplayedId = latest.id;
                     });
                 }
             }
 
             @Override
             public void onNoNewTransfer() {
-                // No action needed if no new transfer
             }
         });
     }
@@ -380,8 +332,6 @@ public class HomeFragment extends Fragment {
         viewModel.getTransferById(transactionId, new BankTransferViewModel.SingleTransferCallback() {
             @Override
             public void onTransferLoaded(BankTransfer transfer) {
-                // Handle showing full transaction details
-                /** Example: Start a new Activity or show a Dialog, Fix to transaction History*/
                 accountInfo.setActivebank(transfer.bankimage);
                 accountInfo.setAmount(transfer.amount);
                 accountInfo.setUserAccount(transfer.senderName);
@@ -403,7 +353,7 @@ public class HomeFragment extends Fragment {
         @Override
         public void run() {
             checkAndUpdateIfNewTransfer();
-            handler.postDelayed(this, 3000); // Check every 3 seconds
+            handler.postDelayed(this, 3000);
         }
     };
 
@@ -416,7 +366,6 @@ public class HomeFragment extends Fragment {
         OfferCardAdapter adapter = new OfferCardAdapter(offers);
         pager.setAdapter(adapter);
 
-        // Auto-scroll
         Handler handler = new Handler();
         Runnable autoScroll = new Runnable() {
             @Override
@@ -443,41 +392,36 @@ public class HomeFragment extends Fragment {
             public void run() {
                 int next = (viewPager.getCurrentItem() + 1) % cards.size();
                 viewPager.setCurrentItem(next, true);
-                andler.postDelayed(this, 8000); // every 8 sec
+                andler.postDelayed(this, 8000);
             }
         };
         andler.postDelayed(autoScroll, 6000);
     }
 
-    private void retrievebalance(){
-        databaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            String amountStr = snapshot.getValue(String.class);
+    @SuppressLint("SetTextI18n")
+    private void retrievebalance() {
+        String objectId = "v6wSoVlYCT";
 
-                            if (amountStr != null) {
-                                try {
-                                    long amount = Long.parseLong(amountStr); // convert string → number
-                                    String formatted = NumberFormat.getNumberInstance(Locale.US).format(amount);
-                                    balance.setText("₦" + formatted + ".00");
-                                    numberHolder = formatted;
-                                    firstcall++;
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("AppData");
 
-                                } catch (NumberFormatException e) {
-                                    balance.setText("₦0");
-                                }
-                            } else {
-                                balance.setText("₦0");
-                            }
-                        }
-                    }
+        query.getInBackground(objectId, (object, e) -> {
+            if (e == null && object != null && object.containsKey("teeghee")) {
+                String teegheeValue = object.getString("teeghee");
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+                requireActivity().runOnUiThread(() -> {
+                    try {
+                        long amount = Long.parseLong(teegheeValue);
+                        String formatted = NumberFormat.getNumberInstance(Locale.US).format(amount);
+                        balance.setText("₦" + formatted + ".00");
+                        numberHolder = formatted;
+                        firstcall++;
+                    } catch (NumberFormatException ex) {
                         balance.setText("₦0");
                     }
                 });
+            } else {
+                requireActivity().runOnUiThread(() -> balance.setText("₦0"));
+            }
+        });
     }
-
 }
